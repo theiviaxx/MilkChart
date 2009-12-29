@@ -36,7 +36,7 @@ Table structure:
 The JavaScript:
 
 	window.addEvent('domready', function() {
-	    var chart = new MilkChart(table[, options]);
+	    var chart = new MilkChart("chart");
 	})
 
 MilkChart Options
