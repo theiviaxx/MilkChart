@@ -32,11 +32,13 @@ Table structure:
 	        </tr>
 	    </tfoot>
 	</table>
+	
+* NOTE: The [tfoot] tag is optional.  This is where row names are stored.  If it's not important, they will be named Row # by default.
 
 The JavaScript:
 
 	window.addEvent('domready', function() {
-	    var chart = new MilkChart("chart");
+	    var chart = new MilkChart.Column("chart");
 	})
 
 MilkChart Options
