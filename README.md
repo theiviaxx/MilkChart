@@ -8,7 +8,7 @@ This library will generate a graph similar to Microsoft Excel.
 How to use
 ----------
 
-To transform a table of data into a chart, simply ccreate a MilkChart object of the chart type you wish passing in the table id and an object containing options for the chart.
+To transform a table of data into a chart, simply create a MilkChart object of the chart type you wish passing in the table id and an object containing options for the chart.
 
 Table structure:
 
