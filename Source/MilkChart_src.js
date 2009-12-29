@@ -13,7 +13,6 @@
 // limitations under the License.
 
 /*
- * MilkChart_src.js
 ---
 description: Graphing/chart tool for mootools 1.2
 
@@ -23,7 +22,7 @@ authors:
 - Brett Dixon
 
 requires: 
-  core/1.2.4: '*'
+  core
 
 provides: [MilkChart.Column, MilkChart.Bar, MilkChart.Line, MilkChart.Scatter, MilkChart.Pie]
 
