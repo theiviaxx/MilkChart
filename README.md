@@ -12,32 +12,32 @@ To transform a table of data into a chart, simply ccreate a MilkChart object of 
 
 Table structure:
 
-<table id="chart">
-    <thead>
-        <tr>
-            <th>Column A</th><th>Column B</th><th>Column C</th><th>Column D</th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr><td>8.3</td><td>70</td><td>10.3</td><td>100</td></tr>
-        <tr><td>8.6</td><td>65</td><td>10.3</td><td>125</td></tr>
-        <tr><td>8.8</td><td>63</td><td>10.2</td><td>106</td></tr>
-        <tr><td>10.5</td><td>72</td><td>16.4</td><td>162</td></tr>
-        <tr><td>11.1</td><td>80</td><td>22.6</td><td>89</td></tr>
-    
-    </tbody>
-    <tfoot>
-        <tr>
-            <td>Row 1</td><td>Row 2</td><td>Row 3</td><td>Row 4</td><td>Row 5</td>
-        </tr>
-    </tfoot>
-</table>
+	<table id="chart">
+	    <thead>
+	        <tr>
+	            <th>Column A</th><th>Column B</th><th>Column C</th><th>Column D</th>
+	        </tr>
+	    </thead>
+	    <tbody>
+	        <tr><td>8.3</td><td>70</td><td>10.3</td><td>100</td></tr>
+	        <tr><td>8.6</td><td>65</td><td>10.3</td><td>125</td></tr>
+	        <tr><td>8.8</td><td>63</td><td>10.2</td><td>106</td></tr>
+	        <tr><td>10.5</td><td>72</td><td>16.4</td><td>162</td></tr>
+	        <tr><td>11.1</td><td>80</td><td>22.6</td><td>89</td></tr>
+	    
+	    </tbody>
+	    <tfoot>
+	        <tr>
+	            <td>Row 1</td><td>Row 2</td><td>Row 3</td><td>Row 4</td><td>Row 5</td>
+	        </tr>
+	    </tfoot>
+	</table>
 
 The JavaScript:
 
-window.addEvent('domready', function() {
-    var chart = new MilkChart(table[, options]);
-})
+	window.addEvent('domready', function() {
+	    var chart = new MilkChart(table[, options]);
+	})
 
 MilkChart Options
 -----------------
@@ -68,19 +68,19 @@ MilkChart Classes
 -----------------
 These are the available classes MilkChart provides and their additional options.
 
-* [Column]
+* Column
   - columnBorder - (bool:Defaults to false) Draws borders around each column
   - columnBorderWeight - (int:Defaults to 2) Width of border in pixels
   - columnBorderColor - (string:Defaults to #000000) Color of the border
-* [Bar]
-* [Line]
+* Bar
+* Line
   - showTicks - (bool:Defaults to false) Draw tick marks at each value
   - showLines - (bool:Defaults to true) Draw lines connecting values
   - lineWeight - (int: Defaults to 3) Line weight in px
-* [Scatter]
+* Scatter
   - showTicks - (bool:Defaults to true) Draw tick marks at each value
   - showLines - (bool:Defaults to false) Draw lines connecting values
-* [Pie]
+* Pie
   - stroke - (bool Defaults to true) Stroke the pie chart
   - strokeWeight - (int: Defaults to 2) Stroke weight in px
   - strokeColor - (string: Defaults to "#000000") Font color on pie slices
