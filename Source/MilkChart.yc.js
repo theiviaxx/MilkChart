@@ -13,7 +13,6 @@
 // limitations under the License.
 
 /*
- * MilkChart_src.js
 ---
 description: Graphing/chart tool for mootools 1.2
 
