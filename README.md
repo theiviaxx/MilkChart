@@ -64,7 +64,7 @@ You can pass several ``options`` to the MilkChart chart object constructors. Eac
  * showValues - (bool: Defaults to true) Show values on one of the axes
  * showKey - (bool: Defaults to true) Shows the column labels
  * useZero - (bool: Defaults to true) Always use 0 as the lowest value
- * useFooter - (bool: Defaults to true) Get row labels from table footer
+ * copy - (bool: Defaults to false) Whether or not to hide the table or not
 
 MilkChart Classes
 -----------------
@@ -90,6 +90,10 @@ These are the available classes MilkChart provides and their additional options.
   - showPercentages - (bool: Defaults to true) Draw slice percentage
   - chartLineWeight - (int: Defaults to 2) Outline line weight in px
   - pieBorder - (bool: Defaults to false) Draw a border around pie
+  
+Chart Colors
+------------
+For the chart colors, your can specify a list of colors and it will repeat those as needed.  You can also specify a single color and MilkChart will create a gradient as needed.  Or you can supply two colors to create a gradient between.
 
 Screenshots
 -----------
