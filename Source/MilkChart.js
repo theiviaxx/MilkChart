@@ -40,6 +40,8 @@ var Point = new Class({
     }
 });
 
+
+
 MilkChart = new Class({
     Implements: [Options,Events],
     options: {
@@ -376,7 +378,8 @@ MilkChart.Column = new Class({
             this.ctx.fillStyle = this.options.fontColor;
             this.ctx.textAlign = "center"
 			if (this.options.showRowNames) {
-				this.ctx.fillText(this.rowNames[rowNameID], rowOrigin.x+(this.rowWidth/2),this.bounds[1].y+(this.rowPadding/2));
+				var rowText = MilkChart.escape(this.rowNames[rowNameID])
+				this.ctx.fillText(rowText, rowOrigin.x+(this.rowWidth/2),this.bounds[1].y+(this.rowPadding/2));
 			}
             
             row.each(function(value) {
@@ -410,6 +413,7 @@ MilkChart.Column = new Class({
         this.colNames.each(function(item) {
             this.ctx.fillStyle = this.options.fontColor;
             this.ctx.textAlign = "left";
+			item = MilkChart.escape(item)
             this.ctx.fillText(item, this.keyBounds[0].x + textMarginLeft, keyOrigin+8);
             this.ctx.fillStyle = this.colors[colorID];
             this.ctx.fillRect(Math.ceil(this.keyBounds[0].x),Math.ceil(keyOrigin),10,10);
@@ -462,7 +466,7 @@ MilkChart.Bar = new Class({
             // Correct values for crisp lines
             lineX = Math.round(lineX) + .5;
             this.ctx.moveTo(lineX, this.bounds[0].y);
-            this.ctx.fillText(String(lineValue), lineX, this.bounds[1].y + 14);
+            this.ctx.fillText(MilkChart.escape(lineValue), lineX, this.bounds[1].y + 14);
             this.ctx.lineTo(lineX, this.bounds[1].y + 4);
             this.ctx.stroke();
         }
@@ -482,7 +486,7 @@ MilkChart.Bar = new Class({
             colorID = 0;
             this.ctx.fillStyle = this.options.fontColor;
             this.ctx.textAlign = "center"
-            this.ctx.fillText(this.rowNames[rowNameID], rowOrigin.x-(colWidth/2),rowOrigin.y-(this.rowPadding/2));
+            this.ctx.fillText(MilkChart.escape(this.rowNames[rowNameID]), rowOrigin.x-(colWidth/2),rowOrigin.y-(this.rowPadding/2));
             row.each(function(value) {
                 this.ctx.beginPath();
                 this.ctx.fillStyle = this.colors[colorID];
@@ -621,7 +625,7 @@ MilkChart.Line = new Class({
         this.colNames.each(function(item, index) {
             this.ctx.fillStyle = this.options.fontColor;
             this.ctx.textAlign = "left";
-            this.ctx.fillText(item, this.keyBounds[0].x + 30, keyOrigin+5);
+            this.ctx.fillText(MilkChart.escape(item), this.keyBounds[0].x + 30, keyOrigin+5);
             this.ctx.fillStyle = this.colors[index];
             this.ctx.strokeStyle = this.colors[index];
             this.ctx.lineWidth = 3;
@@ -652,7 +656,7 @@ MilkChart.Line = new Class({
         
         this.rowNames.each(function(item, index) {
             // Draw row labels
-            this.ctx.fillText(this.rowNames[index], origin.x+rowCenter,this.bounds[1].y+(this.rowPadding/2));
+            this.ctx.fillText(MilkChart.escape(this.rowNames[index]), origin.x+rowCenter,this.bounds[1].y+(this.rowPadding/2));
             origin.x += this.rowWidth;
         }.bind(this))
     }
@@ -800,7 +804,7 @@ MilkChart.Pie = new Class({
         this.rowNames.each(function(item) {
             this.ctx.fillStyle = this.options.fontColor;
             this.ctx.textAlign = "left";
-            this.ctx.fillText(item, this.keyBounds[0].x + 14, keyOrigin+8);
+            this.ctx.fillText(MilkChart.escape(item), this.keyBounds[0].x + 14, keyOrigin+8);
             this.ctx.fillStyle = this.colors[colorID];
             this.ctx.fillRect(Math.ceil(this.keyBounds[0].x),Math.ceil(keyOrigin),10,10);
             
@@ -865,3 +869,16 @@ MilkChart.Shapes = new Hash({
         ctx.fill();
     }
 })
+MilkChart.escape = function(str) {
+	str = String(str);
+	var patterns = [
+		[/\&amp;/g,'&'],
+		[/\&lt;/g,'<'],
+		[/\&gt;/g,'>']
+	]
+	patterns.each(function(item) {
+		str = str.replace(item[0], item[1]);
+	})
+	
+	return str
+}
