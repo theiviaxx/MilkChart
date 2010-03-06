@@ -64,7 +64,8 @@ MilkChart = new Class({
         showKey: true,
 		useZero: true,
 		copy: false,
-		data: {}
+		data: {},
+		onFail: $empty
     },
     initialize: function(el, options) {
         this.setOptions(options);
