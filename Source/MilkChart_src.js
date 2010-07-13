@@ -485,8 +485,9 @@ MilkChart.Bar = new Class({
             rowOrigin = new Point(origin.x, origin.y);
             colorID = 0;
             this.ctx.fillStyle = this.options.fontColor;
-            this.ctx.textAlign = "center"
-            this.ctx.fillText(MilkChart.escape(this.rowNames[rowNameID]), rowOrigin.x-(colWidth/2),rowOrigin.y-(this.rowPadding/2));
+            this.ctx.textAlign = "center";
+			var textWidth = Math.ceil(this.ctx.measureText(this.rowNames[rowNameID]).width);
+			this.ctx.fillText(MilkChart.escape(this.rowNames[rowNameID]), rowOrigin.x-((colWidth+textWidth)/2),rowOrigin.y-(this.rowPadding/2));
             row.each(function(value) {
                 this.ctx.beginPath();
                 this.ctx.fillStyle = this.colors[colorID];
