@@ -158,8 +158,8 @@ MilkChart = new Class({
         this.chartHeight = this.bounds[1].y - this.bounds[0].y;
     },
     drawTitle: function() {
-		titleHeightRatio = 1.25;
-        titleHeight = this.options.titleSize * titleHeightRatio;
+		var titleHeightRatio = 1.25;
+        var titleHeight = this.options.titleSize * titleHeightRatio;
         this.ctx.textAlign = 'center';
         this.ctx.font = this.options.titleSize + "px " + this.options.titleFont;
         this.ctx.fillStyle = this.options.titleColor;
@@ -190,17 +190,17 @@ MilkChart = new Class({
          * to the values in the table.
          *********************************/
 		
-		dist = [1, 2, 5, 10, 20, 50, 100, 150, 500, 1000];
-		maxLines = 9;
-		i = 0;
+		var dist = [1, 2, 5, 10, 20, 50, 100, 150, 500, 1000, 1500, 2500, 5000, 10000];
+		var maxLines = 9;
+		var i = 0;
 		this.chartLines = 1;
 		delta = Math.floor((this.maxY - this.minY));
 		while (Math.floor((delta / dist[i])) > maxLines) {
 			i++;
 		}
 		this.chartLines = Math.floor((delta / dist[i])) + 2;
-		mult = dist[i];
-		negativeScale = (this.minY < 0) ? (mult + this.minY) : 0;
+		var mult = dist[i];
+		var negativeScale = (this.minY < 0) ? (mult + this.minY) : 0;
 		
 		// Set the bounds ratio
 		this.ratio = (this.chartHeight) / (((this.chartLines - 1) * mult) + (mult / 3));
@@ -209,14 +209,14 @@ MilkChart = new Class({
 		this.ctx.textAlign = "right";
 		this.ctx.fillStyle = this.options.fontColor;
 		
-		boundsHeight = this.bounds[1].y - this.bounds[0].y;
-		lineHeight = Math.floor(boundsHeight / (this.chartLines - 1));
+		var boundsHeight = this.bounds[1].y - this.bounds[0].y;
+		var lineHeight = Math.floor(boundsHeight / (this.chartLines - 1));
 		
 		for (i = 0; i < this.chartLines; i++) {
 			this.ctx.fillStyle = this.options.fontColor;
-			lineY = this.bounds[1].y - (i * lineHeight);
+			var lineY = this.bounds[1].y - (i * lineHeight);
 			
-			lineValue = (this.chartLines * mult) - ((this.chartLines - i) * mult) + this.minY - negativeScale;
+			var lineValue = (this.chartLines * mult) - ((this.chartLines - i) * mult) + this.minY - negativeScale;
 			this.ctx.beginPath();
 			// Correct values for crisp lines
 			lineY += .5;
@@ -367,14 +367,14 @@ MilkChart.Column = new Class({
         /*************************************
          * Draws the graph
          ************************************/
-        y = (this.minY >= 0) ? this.bounds[1].y : this.bounds[1].y - Math.floor((this.chartHeight/(this.chartLines-1)));
-        origin = new Point(this.bounds[0].x, y);
-        rowPadding = Math.floor(this.rowWidth * .16);
-        colWidth = Math.ceil((this.rowWidth - (rowPadding*2)) / this.rows[0].length);
-        rowNameID = 0;
+        var y = (this.minY >= 0) ? this.bounds[1].y : this.bounds[1].y - Math.floor((this.chartHeight/(this.chartLines-1)));
+        var origin = new Point(this.bounds[0].x, y);
+        var rowPadding = Math.floor(this.rowWidth * .16);
+        var colWidth = Math.ceil((this.rowWidth - (rowPadding*2)) / this.rows[0].length);
+        var rowNameID = 0;
         this.rows.each(function(row) {
-            rowOrigin = new Point(origin.x, origin.y);
-            colorID = 0;
+            var rowOrigin = new Point(origin.x, origin.y);
+            var colorID = 0;
             this.ctx.fillStyle = this.options.fontColor;
             this.ctx.textAlign = "center"
 			if (this.options.showRowNames) {
@@ -385,7 +385,7 @@ MilkChart.Column = new Class({
             row.each(function(value) {
                 this.ctx.beginPath();
                 this.ctx.fillStyle = this.colors[colorID];
-                colHeight = Math.ceil(value*this.ratio);
+                var colHeight = Math.ceil(value*this.ratio);
 				
 				this.ctx.fillStyle = this.colors[colorID];
                 this.ctx.fillRect(rowOrigin.x+rowPadding, rowOrigin.y-colHeight, colWidth, colHeight);
@@ -403,12 +403,12 @@ MilkChart.Column = new Class({
         }.bind(this))
     },
     drawKey: function() {
-        colorID = 0;
+        var colorID = 0;
         // Add a margin to the column names
-        textMarginLeft = 14;
-        keyNameHeight = Math.ceil(this.height * .05);
-        keyHeight = this.colNames.length * keyNameHeight;
-        keyOrigin = (this.height - keyHeight) / 2;
+        var textMarginLeft = 14;
+        var keyNameHeight = Math.ceil(this.height * .05);
+        var keyHeight = this.colNames.length * keyNameHeight;
+        var keyOrigin = (this.height - keyHeight) / 2;
         
         this.colNames.each(function(item) {
             this.ctx.fillStyle = this.options.fontColor;
@@ -436,17 +436,17 @@ MilkChart.Bar = new Class({
         /**********************************
          * Draws horizontal value lines
          *********************************/
-		dist = [1, 2, 5, 10, 20, 50, 100, 150, 500, 1000];
-		maxLines = 9;
-		i = 0;
+		var dist = [1, 2, 5, 10, 20, 50, 100, 150, 500, 1000];
+		var maxLines = 9;
+		var i = 0;
 		this.chartLines = 1;
 		delta = Math.floor((this.maxY - this.minY));
 		while (Math.floor((delta / dist[i])) > maxLines) {
 			i++;
 		}
 		this.chartLines = Math.floor((delta / dist[i])) + 2;
-		mult = dist[i];
-		negativeScale = (this.minY < 0) ? (mult + this.minY) : 0;
+		var mult = dist[i];
+		var negativeScale = (this.minY < 0) ? (mult + this.minY) : 0;
 		
 		// Set the bounds ratio
 		// this.ratio = (this.chartHeight) / (((this.chartLines - 1) * mult) + (mult / 3));
@@ -455,16 +455,15 @@ MilkChart.Bar = new Class({
         this.ctx.font = this.options.fontSize + "px " + this.options.font;
         this.ctx.textAlign = "center";
         this.ctx.fillStyle = this.options.fontColor;
-        boundsHeight = this.bounds[1].y - this.bounds[0].y;
-        lineHeight = Math.ceil(this.chartWidth / (this.chartLines - 1));
+        var boundsHeight = this.bounds[1].y - this.bounds[0].y;
+        var lineHeight = Math.ceil(this.chartWidth / (this.chartLines - 1));
         for (i=0;i<this.chartLines;i++) {
             this.ctx.fillStyle = this.options.fontColor;
-            //lineY = this.bounds[1].y - (i * lineHeight);
-            lineX = this.bounds[0].x + (i * lineHeight);
-            lineValue = (this.chartLines * mult) - ((this.chartLines-i) * mult) + this.minY;
+            var lineX = this.bounds[0].x + (i * lineHeight);
+            var lineValue = (this.chartLines * mult) - ((this.chartLines-i) * mult) + this.minY;
             this.ctx.beginPath();
             // Correct values for crisp lines
-            lineX = Math.round(lineX) + .5;
+            var lineX = Math.round(lineX) + .5;
             this.ctx.moveTo(lineX, this.bounds[0].y);
             this.ctx.fillText(MilkChart.escape(lineValue), lineX, this.bounds[1].y + 14);
             this.ctx.lineTo(lineX, this.bounds[1].y + 4);
@@ -475,15 +474,15 @@ MilkChart.Bar = new Class({
         /*************************************
          * Draws the graph
          ************************************/
-        origin = new Point(this.bounds[0].x, this.bounds[1].y);
+        var origin = new Point(this.bounds[0].x, this.bounds[1].y);
         this.colHeight = Math.round(this.chartHeight / this.rows.length);
-        padding = .16;
-        rowPadding = Math.ceil(this.colHeight * padding);
-        colWidth = Math.ceil((this.colHeight - (rowPadding*2)) / this.rows[0].length);
-        rowNameID = 0;
+        var padding = .16;
+        var rowPadding = Math.ceil(this.colHeight * padding);
+        var colWidth = Math.ceil((this.colHeight - (rowPadding*2)) / this.rows[0].length);
+        var rowNameID = 0;
         this.rows.each(function(row) {
-            rowOrigin = new Point(origin.x, origin.y);
-            colorID = 0;
+            var rowOrigin = new Point(origin.x, origin.y);
+            var colorID = 0;
             this.ctx.fillStyle = this.options.fontColor;
             this.ctx.textAlign = "center";
 			var textWidth = Math.ceil(this.ctx.measureText(this.rowNames[rowNameID]).width);
@@ -491,7 +490,7 @@ MilkChart.Bar = new Class({
             row.each(function(value) {
                 this.ctx.beginPath();
                 this.ctx.fillStyle = this.colors[colorID];
-                colHeight = Math.ceil(value*this.ratio);
+                var colHeight = Math.ceil(value*this.ratio);
                 this.ctx.fillRect(rowOrigin.x, rowOrigin.y-rowPadding, colHeight, colWidth);
                 rowOrigin.y -= colWidth;
                 colorID++;
@@ -554,7 +553,7 @@ MilkChart.Line = new Class({
             row.getChildren().each(function(node, index) {
                 val = Number(node.get('html'));
                 if (!$type(val)) {
-                    val = node.get('html').toFloat();
+                    var val = node.get('html').toFloat();
                 }
                 this.rows[index].push(val)
                 if (val > this.maxY) this.maxY = val;
@@ -574,23 +573,23 @@ MilkChart.Line = new Class({
         /*************************************
          * Draws the graph
          ************************************/
-        origin = new Point(this.bounds[0].x, this.bounds[1].y);
-        rowCenter = this.rowWidth / 2;
-        rowNameID = 0;
-        colorID = 0;
-        y = (this.minY >= 0) ? this.bounds[1].y + (this.minY * this.ratio) : this.bounds[1].y - Math.floor((this.chartHeight/(this.chartLines-1)));
+        var origin = new Point(this.bounds[0].x, this.bounds[1].y);
+        var rowCenter = this.rowWidth / 2;
+        var rowNameID = 0;
+        var colorID = 0;
+        var y = (this.minY >= 0) ? this.bounds[1].y + (this.minY * this.ratio) : this.bounds[1].y - Math.floor((this.chartHeight/(this.chartLines-1)));
         shapeIndex = 0;
         this.rows.each(function(row, index) {
             if (this.options.showLines) {
-                rowOrigin = new Point(origin.x, origin.y);
-                lineOrigin = this.bounds[0].x + rowCenter;
+                var rowOrigin = new Point(origin.x, origin.y);
+                var lineOrigin = this.bounds[0].x + rowCenter;
                 this.ctx.lineWidth = this.options.lineWeight;
                 this.ctx.beginPath();
                 this.ctx.strokeStyle = this.colors[colorID];
                 this.ctx.moveTo(rowOrigin.x+rowCenter, y - (row[0] * this.ratio));
                 row.each(function(value) {
-                    pointCenter = rowOrigin.x + rowCenter;
-                    point = new Point(pointCenter, y - (value * this.ratio));
+                    var pointCenter = rowOrigin.x + rowCenter;
+                    var point = new Point(pointCenter, y - (value * this.ratio));
                     this.ctx.lineTo(point.x, point.y);
                     rowOrigin.x += this.rowWidth;
                     
@@ -599,12 +598,12 @@ MilkChart.Line = new Class({
             }
             
             if (this.options.showTicks) {
-                rowOrigin = new Point(origin.x, origin.y);
-                lineOrigin = this.bounds[0].x + rowCenter;
-                shape = this.shapes[shapeIndex];
+                var rowOrigin = new Point(origin.x, origin.y);
+                var lineOrigin = this.bounds[0].x + rowCenter;
+                var shape = this.shapes[shapeIndex];
                 row.each(function(value) {
-                    pointCenter = rowOrigin.x + rowCenter;
-                    point = new Point(pointCenter, y - (value * this.ratio));
+                    var pointCenter = rowOrigin.x + rowCenter;
+                    var point = new Point(pointCenter, y - (value * this.ratio));
                     shape(this.ctx, point.x, point.y, 10, this.colors[colorID]);
                     
                     rowOrigin.x += this.rowWidth;
@@ -619,9 +618,9 @@ MilkChart.Line = new Class({
         this.__drawRowLabels();
     },
     drawKey: function() {
-        keyNameHeight = Math.ceil(this.height * .05);
-        keyHeight = this.colNames.length * keyNameHeight;
-        keyOrigin = (this.height - keyHeight) / 2;
+        var keyNameHeight = Math.ceil(this.height * .05);
+        var keyHeight = this.colNames.length * keyNameHeight;
+        var keyOrigin = (this.height - keyHeight) / 2;
         
         this.colNames.each(function(item, index) {
             this.ctx.fillStyle = this.options.fontColor;
@@ -640,7 +639,7 @@ MilkChart.Line = new Class({
             }
             
             if (this.options.showTicks) {
-                shape = this.shapes[index];
+                var shape = this.shapes[index];
                 shape(this.ctx, this.keyBounds[0].x + 10, keyOrigin, 10, this.colors[index]);
             }
             
@@ -648,8 +647,8 @@ MilkChart.Line = new Class({
         }.bind(this))
     },
     __drawRowLabels: function() {
-        origin = new Point(this.bounds[0].x, this.bounds[1].y);
-        rowCenter = this.rowWidth / 2;
+        var origin = new Point(this.bounds[0].x, this.bounds[1].y);
+        var rowCenter = this.rowWidth / 2;
         
         this.ctx.fillStyle = this.options.fontColor;
         this.ctx.lineWidth = 1;
@@ -725,12 +724,12 @@ MilkChart.Pie = new Class({
 		   this.rowNames.push(item.get('html'));
         }.bind(this));
 		
-        pieTotal = 0;
+        var pieTotal = 0;
         
         // Get data from rows
 		this.element.getElement('tbody').getChildren()[0].getChildren().each(function(node) {
-            dataRow = [];
-            val = node.get('html').toInt();
+            var dataRow = [];
+            var val = node.get('html').toInt();
             dataRow.push(val);
             pieTotal += val;
             this.rows.push(dataRow);
@@ -742,9 +741,8 @@ MilkChart.Pie = new Class({
         });
     },
     draw: function() {
-        arcStart = 0;
-        blah = 0;
-		center = new Point((this.bounds[1].x / 2) + this.options.padding, (this.bounds[1].y / 2) + this.options.padding);
+        var arcStart = 0;
+		var center = new Point((this.bounds[1].x / 2) + this.options.padding, (this.bounds[1].y / 2) + this.options.padding);
         if (this.options.shadow) {
             var radgrad = this.ctx.createRadialGradient(center.x, center.y, this.radius, center.x*1.03, center.y*1.03, this.radius*1.05);
             radgrad.addColorStop(0.5, '#000000');
@@ -774,13 +772,13 @@ MilkChart.Pie = new Class({
 				this.ctx.font = this.options.fontSize + "px " + this.options.font;
                 this.ctx.fillStyle = this.options.chartTextColor;
 				this.ctx.textAlign = "center";
-                start = (Math.PI/180) * (arcStart);
-                end = (Math.PI/180) * (item[1] + arcStart);
-                centerAngle = start + ((end - start) / 2);
-                percent = Math.round((item[0]/pieTotal)*100);
-                centerDist = (percent < 5) ? .90 : 1.75;
-                x = this.radius * Math.cos(centerAngle) / centerDist;
-                y = this.radius * Math.sin(centerAngle) / centerDist;
+                var start = (Math.PI/180) * (arcStart);
+                var end = (Math.PI/180) * (item[1] + arcStart);
+                var centerAngle = start + ((end - start) / 2);
+                var percent = Math.round((item[0]/pieTotal)*100);
+                var centerDist = (percent < 5) ? .90 : 1.75;
+                var x = this.radius * Math.cos(centerAngle) / centerDist;
+                var y = this.radius * Math.sin(centerAngle) / centerDist;
                 this.ctx.fillText(percent + "%", center.x + x, center.y + y);
             }
             arcStart += item[1];
@@ -794,11 +792,11 @@ MilkChart.Pie = new Class({
         }
     },
     drawKey: function() {
-        colorID = 0;
-        keyNameHeight = Math.ceil(this.height * .05);
-        keyHeight = this.rowNames.length * keyNameHeight;
-		keyHeight = (keyHeight > this.height) ? this.height * .9 : keyHeight;
-        keyOrigin = (this.height - keyHeight) / 2;
+        var colorID = 0;
+        var keyNameHeight = Math.ceil(this.height * .05);
+        var keyHeight = this.rowNames.length * keyNameHeight;
+		var keyHeight = (keyHeight > this.height) ? this.height * .9 : keyHeight;
+        var keyOrigin = (this.height - keyHeight) / 2;
         
         this.ctx.font = this.options.fontSize + "px " + this.options.font;
         

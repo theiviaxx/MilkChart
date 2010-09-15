@@ -1,0 +1,273 @@
+<!DOCTYPE HTML>
+<html>
+	<head>
+		<title>Demo</title>
+		<link rel="stylesheet" type="text/css" href="jxlib/themes/crispin/jxtheme.css" />
+		<script type="text/javascript" src="../mootoolsCore.js"></script>
+		<script type="text/javascript" src="../mootoolsMore.js"></script>
+		<script type="text/javascript" src="jxlib/jxlib.standalone.js"></script>
+		<script type="text/javascript" src="../MilkChart.js"></script>
+		<style type="text/css"> 
+			body, html {
+				font-family: 'Verdana';
+				font-size: 10pt;
+			}
+			#main > div {float:left;margin: 12px;}
+			table {
+				border-collapse: collapse;
+				border: 1px solid #fff;
+			}
+			thead {
+				background: #ebf1e3;
+			}
+			tbody {
+				background: #e2e7f1;
+			}
+			tfoot {
+				background: #e7e3ec;
+			}
+			td, th {
+				padding: 4px;
+			}
+			a {
+				color: #799244;
+			}
+		</style> 
+	<script type="text/javascript">
+		var m, optPanel;
+		var opt = {
+			chart_type: "Column",
+			width: 480,
+	        height: 290,
+			colors: ['#4f81bd', '#c0504d', '#9bbb59', '#8064a2', '#4198af', '#db843d'],
+	        padding: 12,
+	        font: "Verdana",
+	        fontColor: "#000000",
+	        fontSize: 10,
+	        background: "#FFFFFF",
+	        chartLineColor: "#878787",
+	        chartLineWeight: 1,
+	        border: true,
+	        borderWeight: 1,
+	        borderColor: "#878787",
+	        titleSize: 18,
+	        titleFont: "Verdana",
+	        titleColor: "#000000",
+	        showRowNames: true,
+	        showValues: true,
+	        showKey: true,
+			useZero: true
+		};
+		function redraw() {
+			try {
+				m.container.destroy();
+			} catch (e) {}
+			m = new MilkChart[opt.chart_type]('table', opt);
+		}
+ 
+		window.addEvent('domready', function() {
+			var clrDefault = new Jx.Menu.Item({
+						label: 'Default',
+						toggle: true,
+						active: true,
+						onClick: function() {
+							opt.colors = ['#4f81bd', '#c0504d', '#9bbb59', '#8064a2', '#4198af', '#db843d'],
+							redraw();
+						}
+					})
+			var clrBlue = new Jx.Menu.Item({
+						label: 'Blue',
+						toggle: true,
+						onClick: function() {
+							opt.colors = ['#3c6494'],
+							redraw();
+						}
+					})
+			var clrOrange = new Jx.Menu.Item({
+						label: 'Orange',
+						toggle: true,
+						onClick: function() {
+							opt.colors = ['#c27535'],
+							redraw();
+						}
+					})
+			var clrGreen = new Jx.Menu.Item({
+						label: 'Green',
+						toggle: true,
+						onClick: function() {
+							opt.colors = ['#799244'],
+							redraw();
+						}
+					})
+			var clrPurple = new Jx.Menu.Item({
+						label: 'Purple',
+						toggle: true,
+						onClick: function() {
+							opt.colors = ['#634d7e'],
+							redraw();
+						}
+					})
+			new Jx.ButtonSet().add(clrDefault, clrBlue, clrOrange, clrGreen, clrPurple);
+			
+			var fntVerdana = new Jx.Menu.Item({
+				label: 'Verdana',
+				active: true,
+				toggle: true,
+				onClick: function() {
+					opt.font = "Verdana",
+					redraw();
+				}
+			})
+			var fntTimes = new Jx.Menu.Item({
+				label: 'Times New Roman',
+				toggle: true,
+				onClick: function() {
+					opt.font = "Times New Roman",
+					redraw();
+				}
+			})
+			var fntArial = new Jx.Menu.Item({
+				label: 'Arial',
+				toggle: true,
+				onClick: function() {
+					opt.font = "Arial",
+					redraw();
+				}
+			})
+			new Jx.ButtonSet().add(fntVerdana, fntTimes, fntArial);
+			
+			var toolBar = new Jx.Toolbar();
+			toolBar.addTo('toolbar')
+			toolBar.add(
+				new Jx.Button.Combo({
+					label: 'Chart Type',
+		            items: [
+						{
+							label: 'Column',
+							image: 'i/chart_bar.png',
+							onClick: function(){opt.chart_type = 'Column';redraw();}
+		                },
+		                {
+							label: 'Bar',
+							image: 'i/chart_bar.png',
+							onClick: function(){opt.chart_type = 'Bar';redraw();}
+		                },
+						{
+							label: 'Line',
+							image: 'i/chart_line.png',
+							onClick: function(){opt.chart_type = 'Line';redraw();}
+		                },{
+							label: 'Scatter',
+							image: 'i/chart_curve.png',
+							onClick: function(){opt.chart_type = 'Scatter';redraw();}
+		                },{
+							label: 'Pie',
+							image: 'i/chart_pie.png',
+							onClick: function(){opt.chart_type = 'Pie';redraw();}
+		                },
+		            ]
+		        }),
+				new Jx.Menu({
+					label: "Global Options"
+				}).add(
+					new Jx.Menu.Item({
+						label: 'Border',
+						toggle: true,
+						active: true,
+						onClick: function(obj) {opt.border = obj.isActive();redraw();}
+					}),
+					new Jx.Menu.Item({
+						label: 'Show Key',
+						toggle: true,
+						active: true,
+						onClick: function(obj) {opt.showKey = obj.isActive();redraw();}
+					}),
+					new Jx.Menu.Item({
+						label: 'Show Row Names',
+						toggle: true,
+						active: true,
+						onClick: function(obj) {opt.showRowNames = obj.isActive();redraw();}
+					}),
+					new Jx.Menu.Item({
+						label: 'Show Row Values',
+						toggle: true,
+						active: true,
+						onClick: function(obj) {opt.showValues = obj.isActive();redraw();}
+					}),
+					new Jx.Menu.Item({
+						label: 'Use Zero',
+						toggle: true,
+						active: true,
+						onClick: function(obj) {opt.useZero = obj.isActive();redraw();}
+					})
+				),
+				new Jx.Menu({
+					label: "Fonts"
+				}).add(fntVerdana, fntTimes, fntArial,
+					new Jx.Menu.SubMenu({label:'Size'}).add(
+						new Jx.Menu.Item({
+							label: '8pt',
+							onClick: function() {opt.fontSize = 8;redraw();}
+						}),
+						new Jx.Menu.Item({
+							label: '10pt',
+							onClick: function() {opt.fontSize = 10;redraw();}
+						}),
+						new Jx.Menu.Item({
+							label: '12pt',
+							onClick: function() {opt.fontSize = 12;redraw();}
+						})
+					)
+				),
+				new Jx.Menu({
+					label: "Colors"
+				}).add(clrDefault, clrBlue, clrOrange, clrGreen, clrPurple)
+			)
+			redraw();
+		});
+		
+	</script>
+	</head>
+	<body>
+		<div id="toolbar"></div> 
+		<div id="main"> 
+			<div> 
+				<table id="table" title='My Chart'> 
+					<thead> 
+				        <tr> 
+				            <th>Internet Explorer</th><th>Firefox</th><th>Safari</th><th>Chrome</th><th>Opera</th> 
+				        </tr> 
+				    </thead> 
+				    <tbody> 
+				        <tr><td>63.94 %</td><td>22.67 %</td><td>3.58 %</td><td>1.56 %</td><td>2.26 %</td></tr> 
+				        <tr><td>66.80 %</td><td>23.00 %</td><td>3.67 %</td><td>2.13 %</td><td>2.07 %</td></tr> 
+				        <tr><td>68.06 %</td><td>23.06 %</td><td>4.13 %</td><td>2.86 %</td><td>2.05 %</td></tr> 
+				        <tr><td>69.13 %</td><td>24.44 %</td><td>4.40 %</td><td>3.87 %</td><td>2.18 %</td></tr> 
+				    </tbody> 
+					<tfoot> 
+						<tr><td>Q1 2009</td><td>Q2 2009</td><td>Q3 2009</td><td>Q4 2009</td></tr> 
+					</tfoot> 
+				</table> 
+			</div> 
+			<div> 
+				<table border='1'> 
+					<thead> 
+				        <tr> 
+				            <th>Internet Explorer</th><th>Firefox</th><th>Safari</th><th>Chrome</th><th>Opera</th> 
+				        </tr> 
+				    </thead> 
+				    <tbody> 
+				        <tr><td>63.94 %</td><td>22.67 %</td><td>3.58 %</td><td>1.56 %</td><td>2.26 %</td></tr> 
+				        <tr><td>66.80 %</td><td>23.00 %</td><td>3.67 %</td><td>2.13 %</td><td>2.07 %</td></tr> 
+				        <tr><td>68.06 %</td><td>23.06 %</td><td>4.13 %</td><td>2.86 %</td><td>2.05 %</td></tr> 
+				        <tr><td>69.13 %</td><td>24.44 %</td><td>4.40 %</td><td>3.87 %</td><td>2.18 %</td></tr> 
+				    </tbody> 
+					<tfoot> 
+						<tr><td>Q1 2009</td><td>Q2 2009</td><td>Q3 2009</td><td>Q4 2009</td></tr> 
+					</tfoot> 
+				</table> 
+				<p><a href="http://en.wikipedia.org/wiki/Usage_share_of_web_browsers#Net_Applications_.282004_Q4_to_present.29">Wikipedia: Net Applications</a></p> 
+			</div> 
+		</div> 
+	</body>
+</html>
