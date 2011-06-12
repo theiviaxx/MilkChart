@@ -3,10 +3,10 @@
 	<head>
 		<title>Demo</title>
 		<link rel="stylesheet" type="text/css" href="jxlib/themes/crispin/jxtheme.css" />
-		<script type="text/javascript" src="j/mootoolsCore.js"></script>
-		<script type="text/javascript" src="j/mootoolsMore.js"></script>
+		<script type="text/javascript" src="../mootoolsCore.js"></script>
+		<script type="text/javascript" src="../mootoolsMore.js"></script>
 		<script type="text/javascript" src="jxlib/jxlib.standalone.js"></script>
-		<script type="text/javascript" src="../MilkChart_src.js"></script>
+		<script type="text/javascript" src="../MilkChart.js"></script>
 		<style type="text/css"> 
 			body, html {
 				font-family: 'Verdana';
