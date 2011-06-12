@@ -65,9 +65,9 @@ MilkChart = new Class({
         showValues: true,
         showKey: true,
 		useZero: true,
-		copy: false,
+		replace: true,
 		data: {},
-		onFail: $empty
+		onFail: function(){}
     },
     initialize: function(el, options) {
         this.setOptions(options);
@@ -104,7 +104,7 @@ MilkChart = new Class({
         }.bind(this));
     },
     prepareCanvas: function() {
-		if (!this.options.copy) {
+		if (this.options.replace) {
 			this.element.setStyle('display', 'none');
 		}
         
@@ -480,6 +480,7 @@ MilkChart.Bar = new Class({
         var rowPadding = Math.ceil(this.colHeight * padding);
         var colWidth = Math.ceil((this.colHeight - (rowPadding*2)) / this.rows[0].length);
         var rowNameID = 0;
+		
         this.rows.each(function(row) {
             var rowOrigin = new Point(origin.x, origin.y);
             var colorID = 0;
@@ -487,6 +488,7 @@ MilkChart.Bar = new Class({
             this.ctx.textAlign = "center";
 			var textWidth = Math.ceil(this.ctx.measureText(this.rowNames[rowNameID]).width);
 			this.ctx.fillText(MilkChart.escape(this.rowNames[rowNameID]), rowOrigin.x-((colWidth+textWidth)/2),rowOrigin.y-(this.rowPadding/2));
+			//row.reverse();
             row.each(function(value) {
                 this.ctx.beginPath();
                 this.ctx.fillStyle = this.colors[colorID];
@@ -514,7 +516,7 @@ MilkChart.Line = new Class({
     options: {
         showTicks: false,
         showLines: true,
-        lineWeight: 3
+        lineWeight: 2
     },
     initialize: function(el, options) {
         this.parent(el, options);
@@ -628,7 +630,7 @@ MilkChart.Line = new Class({
             this.ctx.fillText(MilkChart.escape(item), this.keyBounds[0].x + 30, keyOrigin+5);
             this.ctx.fillStyle = this.colors[index];
             this.ctx.strokeStyle = this.colors[index];
-            this.ctx.lineWidth = 3;
+            this.ctx.lineWidth = this.options.lineWeight;
             
             if (this.options.showLines) {
                 this.ctx.beginPath();
@@ -735,6 +737,7 @@ MilkChart.Pie = new Class({
             this.rows.push(dataRow);
             
         }.bind(this));
+		this.pieTotal = pieTotal;
         
         this.rows.each(function(item) {
             item.push((item[0]/pieTotal) * 360);
@@ -743,10 +746,11 @@ MilkChart.Pie = new Class({
     draw: function() {
         var arcStart = 0;
 		var center = new Point((this.bounds[1].x / 2) + this.options.padding, (this.bounds[1].y / 2) + this.options.padding);
+		
         if (this.options.shadow) {
-            var radgrad = this.ctx.createRadialGradient(center.x, center.y, this.radius, center.x*1.03, center.y*1.03, this.radius*1.05);
-            radgrad.addColorStop(0.5, '#000000');
-            radgrad.addColorStop(0.75, '#000000');
+            var radgrad = this.ctx.createRadialGradient(center.x, center.y, 0, center.x*1.03, center.y*1.03, this.radius*1.05);
+            radgrad.addColorStop(0.5, 'rgb(0,0,0)');
+            radgrad.addColorStop(0.75, 'rgb(0,0,0)');
             radgrad.addColorStop(1, 'rgba(0,0,0,0)');
             this.ctx.fillStyle = radgrad;
             this.ctx.fillRect(this.bounds[0].x,this.bounds[0].y,this.width,this.height);
@@ -774,8 +778,8 @@ MilkChart.Pie = new Class({
 				this.ctx.textAlign = "center";
                 var start = (Math.PI/180) * (arcStart);
                 var end = (Math.PI/180) * (item[1] + arcStart);
-                var centerAngle = start + ((end - start) / 2);
-                var percent = Math.round((item[0]/pieTotal)*100);
+                var centerAngle = start + ((end - start) / 2) + (this.options.fontSize / 300); // This last bit offets the center angle based on the font size
+                var percent = Math.round((item[0]/this.pieTotal)*100);
                 var centerDist = (percent < 5) ? .90 : 1.75;
                 var x = this.radius * Math.cos(centerAngle) / centerDist;
                 var y = this.radius * Math.sin(centerAngle) / centerDist;
@@ -846,7 +850,7 @@ MilkChart.Shapes = new Hash({
         x -= size/2;
         y -= size/2;
         ctx.strokeStyle = color;
-        ctx.lineWidth = 1;
+        ctx.lineWidth = 2;
         ctx.beginPath();
         ctx.moveTo(x,y);
         ctx.lineTo(x+size, y+size);
