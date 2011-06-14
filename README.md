@@ -33,7 +33,7 @@ Table structure:
 	    </tfoot>
 	</table>
 	
-* NOTE: The [tfoot] tag is optional.  This is where row names are stored.  If it's not important, they will be named Row # by default.
+* NOTE: The ``<tfoot>`` tag is optional.  This is where row names are stored.  If it's not important, they will be named Row # by default.
 
 The JavaScript:
 
