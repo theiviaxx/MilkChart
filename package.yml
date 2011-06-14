@@ -2,6 +2,6 @@ name: MilkChart
 author: theiviaxx
 category: Widgets
 tags: [chart, graph, canvas]
-docs: http://code.google.com/p/milkchart/w/list
-demo: http://brettdixon.com/demo/MilkChart.html
-current: 1.1
+docs: https://github.com/theiviaxx/MilkChart/wiki
+#demo: http://brettdixon.com/demo/MilkChart.html
+current: 1.2
