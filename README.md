@@ -3,7 +3,7 @@ Plugin Name
 
 This library will generate a graph similar to Microsoft Excel.
 
-![Screenshot](http://www.brettdixon.com/column.jpg)
+![Screenshot](http://app.brettdixon.com/column.jpg)
 
 How to use
 ----------
@@ -98,9 +98,8 @@ For the chart colors, your can specify a list of colors and it will repeat those
 Screenshots
 -----------
 
-![Column Chart](http://www.brettdixon.com/column.jpg)
-![Bar Chart](http://www.brettdixon.com/bar.jpg)
-![Line Chart](http://www.brettdixon.com/line.jpg)
-![Line Chart](http://www.brettdixon.com/line.jpg)
-![Scatter Chart](http://www.brettdixon.com/scatter.jpg)
-![Pie Chart](http://www.brettdixon.com/pie.jpg)
+![Column Chart](http://app.brettdixon.com/column.jpg)
+![Bar Chart](http://app.brettdixon.com/bar.jpg)
+![Line Chart](http://app.brettdixon.com/line.jpg)
+![Scatter Chart](http://app.brettdixon.com/scatter.jpg)
+![Pie Chart](http://app.brettdixon.com/pie.jpg)
