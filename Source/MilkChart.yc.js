@@ -22,7 +22,7 @@ authors:
 - Brett Dixon
 
 requires: 
-  core
+  core/1.2.5:Core
 
 provides: [MilkChart.Column, MilkChart.Bar, MilkChart.Line, MilkChart.Scatter, MilkChart.Pie]
 
