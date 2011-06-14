@@ -101,5 +101,6 @@ Screenshots
 ![Column Chart](http://www.brettdixon.com/column.jpg)
 ![Bar Chart](http://www.brettdixon.com/bar.jpg)
 ![Line Chart](http://www.brettdixon.com/line.jpg)
+![Line Chart](http://www.brettdixon.com/line.jpg)
 ![Scatter Chart](http://www.brettdixon.com/scatter.jpg)
 ![Pie Chart](http://www.brettdixon.com/pie.jpg)
