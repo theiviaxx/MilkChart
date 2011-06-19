@@ -1,9 +1,9 @@
-Plugin Name
-===========
+MilkChart
+=========
 
 This library will generate a graph similar to Microsoft Excel.
 
-![Screenshot](http://app.brettdixon.com/column.jpg)
+![Screenshot](http://www.brettdixon.com/column.jpg)
 
 How to use
 ----------
@@ -90,6 +90,11 @@ These are the available classes MilkChart provides and their additional options.
   - showPercentages - (bool: Defaults to true) Draw slice percentage
   - chartLineWeight - (int: Defaults to 2) Outline line weight in px
   - pieBorder - (bool: Defaults to false) Draw a border around pie
+* Doughnut
+
+AJAX Loading(JSON)
+------------------
+You can call the `load` method on any MilkChart type to load a JSON dataset from a url.  It accepts the same options as Request, except for onSuccess.
   
 Chart Colors
 ------------
@@ -98,8 +103,9 @@ For the chart colors, your can specify a list of colors and it will repeat those
 Screenshots
 -----------
 
-![Column Chart](http://app.brettdixon.com/column.jpg)
-![Bar Chart](http://app.brettdixon.com/bar.jpg)
-![Line Chart](http://app.brettdixon.com/line.jpg)
-![Scatter Chart](http://app.brettdixon.com/scatter.jpg)
-![Pie Chart](http://app.brettdixon.com/pie.jpg)
+![Column Chart](http://www.brettdixon.com/column.jpg)
+![Bar Chart](http://www.brettdixon.com/bar.jpg)
+![Line Chart](http://www.brettdixon.com/line.jpg)
+![Scatter Chart](http://www.brettdixon.com/scatter.jpg)
+![Pie Chart](http://www.brettdixon.com/pie.jpg)
+![Doughnut Chart](http://www.brettdixon.com/doughut.jpg)
