@@ -108,4 +108,4 @@ Screenshots
 ![Line Chart](http://www.brettdixon.com/line.jpg)
 ![Scatter Chart](http://www.brettdixon.com/scatter.jpg)
 ![Pie Chart](http://www.brettdixon.com/pie.jpg)
-![Doughnut Chart](http://www.brettdixon.com/doughut.jpg)
+![Doughnut Chart](http://www.brettdixon.com/doughnut.jpg)
