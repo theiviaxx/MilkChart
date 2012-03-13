@@ -22,8 +22,8 @@ authors:
 - Brett Dixon
 
 requires: 
-  core/1.3.1: *
-  more/1.3.2: Color
+- core/1.3.1: *
+- more/1.3.2: Color
 
 provides: [MilkChart.Column, MilkChart.Bar, MilkChart.Line, MilkChart.Scatter, MilkChart.Pie, MilkChart.Doughnut]
 
