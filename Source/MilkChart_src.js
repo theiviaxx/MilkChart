@@ -14,7 +14,7 @@
 
 /*
 ---
-description: Graphing/chart tool for mootools 1.2
+description: Graphing/chart tool for MooTools
 
 license: Apache License, Version 2.0
 
@@ -22,9 +22,10 @@ authors:
 - Brett Dixon
 
 requires: 
-  core/1.2.5:Core
+  core/1.3.1: *
+  more/1.3.2: Color
 
-provides: [MilkChart.Column, MilkChart.Bar, MilkChart.Line, MilkChart.Scatter, MilkChart.Pie]
+provides: [MilkChart.Column, MilkChart.Bar, MilkChart.Line, MilkChart.Scatter, MilkChart.Pie, MilkChart.Doughnut]
 
 ...
 */
@@ -102,9 +103,9 @@ MilkChart.Base = new Class({
 		
 		this.shapes = [];
 		// This could be done in a list, but an object is more readable
-        MilkChart.Shapes.each(function(shape) {
+        Object.each(MilkChart.Shapes, function(shape) {
             this.shapes.push(shape);
-        }.bind(this));
+        }, this);
     },
     prepareCanvas: function() {
 		if (!this.options.copy && this.element.get('tag') == "table") {
@@ -235,7 +236,7 @@ MilkChart.Base = new Class({
 			this.ctx.fillStyle = this.options.fontColor;
 			var lineY = this.bounds[1].y - (i * lineHeight);
 			
-			var lineValue = (this.chartLines * mult) - ((this.chartLines - i) * mult) + this.minY - negativeScale;
+			var lineValue = Math.round((this.chartLines * mult) - ((this.chartLines - i) * mult) + this.minY - negativeScale);
 			this.ctx.beginPath();
 			// Correct values for crisp lines
 			lineY += .5;
@@ -435,7 +436,7 @@ MilkChart.Column = new Class({
             var dataRow = [];
             row.getChildren().each(function(node) {
                 val = Number(node.get('html'));
-                if (!$type(val)) {
+                if (!typeOf(val)) {
                     val = node.get('html').toFloat();
                 }
                 dataRow.push(val);
@@ -715,7 +716,7 @@ MilkChart.Line = new Class({
         this.element.getElement('tbody').getChildren().each(function(row) {
             row.getChildren().each(function(node, index) {
                 val = Number(node.get('html'));
-                if (!$type(val)) {
+                if (!typeOf(val)) {
                     var val = node.get('html').toFloat();
                 }
                 this.data.rows[index].push(val)
@@ -1208,7 +1209,7 @@ MilkChart.Doughnut = new Class({
 
 
 // Shapes for tick marks
-MilkChart.Shapes = new Hash({
+MilkChart.Shapes = {
 	/*********************************************
 	 * This object is here for easy reference. Feel
 	 * free to add any additional shapes here.
@@ -1271,7 +1272,7 @@ MilkChart.Shapes = new Hash({
         ctx.lineTo(x, y+size);
         ctx.stroke();
     }
-})
+};
 MilkChart.escape = function(str) {
 	str = String(str);
 	var patterns = [
