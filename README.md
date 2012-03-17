@@ -6,7 +6,7 @@ MilkChart is released under the MIT license. It is simple and easy to understand
 
 This library will generate a graph similar to Microsoft Excel.
 
-![Screenshot](http://www.brettdixon.com/column.jpg)
+![Screenshot](http://www.brettdixon.com/static/column.jpg)
 
 How to use
 ----------
@@ -106,9 +106,9 @@ For the chart colors, your can specify a list of colors and it will repeat those
 Screenshots
 -----------
 
-![Column Chart](http://www.brettdixon.com/column.jpg)
-![Bar Chart](http://www.brettdixon.com/bar.jpg)
-![Line Chart](http://www.brettdixon.com/line.jpg)
-![Scatter Chart](http://www.brettdixon.com/scatter.jpg)
-![Pie Chart](http://www.brettdixon.com/pie.jpg)
-![Doughnut Chart](http://www.brettdixon.com/doughnut.jpg)
+![Column Chart](http://www.brettdixon.com/static/column.jpg)
+![Bar Chart](http://www.brettdixon.com/static/bar.jpg)
+![Line Chart](http://www.brettdixon.com/static/line.jpg)
+![Scatter Chart](http://www.brettdixon.com/static/scatter.jpg)
+![Pie Chart](http://www.brettdixon.com/static/pie.jpg)
+![Doughnut Chart](http://www.brettdixon.com/static/doughnut.jpg)
