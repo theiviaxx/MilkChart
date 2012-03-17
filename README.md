@@ -1,6 +1,9 @@
 MilkChart
 =========
 
+MilkChart is released under the MIT license. It is simple and easy to understand and places almost no restrictions on what you can do with MilkChart.
+[More Information](http://en.wikipedia.org/wiki/MIT_License)
+
 This library will generate a graph similar to Microsoft Excel.
 
 ![Screenshot](http://www.brettdixon.com/column.jpg)
