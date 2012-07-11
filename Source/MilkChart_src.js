@@ -160,6 +160,7 @@ MilkChart.Base = new Class({
             this.titleBounds = [new Point(this.bounds[0].x, 0), new Point(this.bounds[1].x, titleHeight)];
             this.drawTitle();
         }
+        this.chartWidth = this.bounds[1].x - this.bounds[0].x;
         if (this.options.showRowNames) {
 			this.ctx.font = this.options.fontSize + "px " + this.options.font;
 			this.getRowPadding();
@@ -169,7 +170,7 @@ MilkChart.Base = new Class({
 			this.rowPadding = 0;
 		}
         
-        this.chartWidth = this.bounds[1].x - this.bounds[0].x;
+        
         this.chartHeight = this.bounds[1].y - this.bounds[0].y;
         this.colors = this.__getColors(this.options.colors);
     },
@@ -177,7 +178,17 @@ MilkChart.Base = new Class({
         return this.ctx.measureText(String(this.maxY)).width;
     },
     getRowPadding: function() {
-    	this.rowPadding = (this.ctx.measureText(this.longestRowName).width > ((this.bounds[1].x - this.bounds[0].x) / this.data.rows.length)) ? this.ctx.measureText(this.longestRowName).width : this.height * 0.1;
+        var rowNameLength = 0;
+        this.data.rowNames.each(function(row) {
+            rowNameLength += this.ctx.measureText(row).width;
+        }, this);
+        var rotateRowNames = (rowNameLength > this.chartWidth);
+        if (rotateRowNames) {
+            this.rowPadding = this.ctx.measureText(this.longestRowName).width;
+        }
+        else {
+            this.rowPadding = (this.ctx.measureText(this.longestRowName).width > ((this.bounds[1].x - this.bounds[0].x) / this.data.rows.length)) ? this.ctx.measureText(this.longestRowName).width : this.height * 0.1;
+        }
     },
     drawTitle: function() {
 		var titleHeightRatio = 1.25;
@@ -470,6 +481,7 @@ MilkChart.Column = new Class({
         var colWidth = Math.ceil((this.rowWidth - (rowPadding*2)) / this.data.rows[0].length);
         // Should we rotate row names?
         var rotateRowNames = (this.ctx.measureText(this.longestRowName).width > this.rowWidth);
+        var divisor = ((this.data.rows.length * this.options.fontSize) / this.chartWidth) / 2;
         
         this.data.rows.each(function(row, idx) {
             var rowOrigin = new Point(origin.x, origin.y);
@@ -483,7 +495,7 @@ MilkChart.Column = new Class({
 					this.ctx.translate(rowOrigin.x+(this.rowWidth/2) + this.options.fontSize, this.bounds[1].y + 4);
 					this.ctx.rotate(-1.57079633);
 					if (this.data.rows.length * this.options.fontSize > this.chartWidth) {
-						if (idx % 8 == 1) {
+						if (idx % divisor == 1) {
 							this.ctx.fillText(rowText, 0, 0);
 						}
 					}
@@ -827,6 +839,7 @@ MilkChart.Line = new Class({
         var rowCenter = this.rowWidth / 2;
         // Should we rotate row names?
         var rotateRowNames = (this.ctx.measureText(this.longestRowName).width > this.rowWidth);
+        var divisor = Math.floor((this.data.rowNames.length * this.options.fontSize) / (this.chartWidth / 2));
         
         this.ctx.fillStyle = this.options.fontColor;
         this.ctx.lineWidth = 1;
@@ -841,7 +854,7 @@ MilkChart.Line = new Class({
 				this.ctx.translate(origin.x+(this.rowWidth/2) + this.options.fontSize, this.bounds[1].y + 4);
 				this.ctx.rotate(-1.57079633);
 				if (this.data.rowNames.length * this.options.fontSize > this.chartWidth) {
-					if (idx % 8 == 1) {
+					if (idx % divisor == 1) {
 						this.ctx.fillText(rowText, 0, 0);
 					}
 				}
