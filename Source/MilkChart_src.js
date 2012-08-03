@@ -313,7 +313,7 @@ MilkChart.Base = new Class({
     			self.render();
     		}
     	};
-    	var merged = $merge(options, reqOptions);
+    	var merged = Object.merge(options, reqOptions);
     	var req = new Request.JSON(merged);
     	req.send();
     	
@@ -686,7 +686,7 @@ MilkChart.Line = new Class({
     			
     		}
     	};
-    	var merged = $merge(options, reqOptions);
+    	var merged = Object.merge(options, reqOptions);
     	var req = new Request.JSON(merged);
     	req.send();
     },
@@ -766,15 +766,19 @@ MilkChart.Line = new Class({
         this.data.rows.each(function(row, index) {
             if (this.options.showLines) {
                 var rowOrigin = new Point(origin.x, origin.y);
-                var lineOrigin = this.bounds[0].x + rowCenter;
+                var lastWasValid = false;
+                var currentIsValid = null;
                 this.ctx.lineWidth = this.options.lineWeight;
-                this.ctx.beginPath();
                 this.ctx.strokeStyle = this.colors[index];
-                this.ctx.moveTo(rowOrigin.x+rowCenter, y - (row[0] * this.ratio));
+                this.ctx.beginPath();
                 row.each(function(value) {
-                    var pointCenter = rowOrigin.x + rowCenter;
-                    var point = new Point(pointCenter, y - (value * this.ratio));
-                    this.ctx.lineTo(point.x, point.y);
+                    currentIsValid = (value != null && value != undefined);
+                    if (lastWasValid && currentIsValid) {
+                        this.ctx.lineTo(rowOrigin.x + rowCenter, y - (value * this.ratio));
+                    } else {
+                        this.ctx.moveTo(rowOrigin.x + rowCenter, y - (value * this.ratio));
+                    }
+                    lastWasValid = currentIsValid;
                     rowOrigin.x += this.rowWidth;
                     
                 }.bind(this));
@@ -783,14 +787,14 @@ MilkChart.Line = new Class({
             
             if (this.options.showTicks) {
                 var rowOrigin = new Point(origin.x, origin.y);
-                var lineOrigin = this.bounds[0].x + rowCenter;
-                shapeIndex = (shapeIndex > MilkChart.Shapes.getLength() - 1) ? 0 : shapeIndex;
+                shapeIndex = (shapeIndex > Object.getLength(MilkChart.Shapes) - 1) ? 0 : shapeIndex;
                 var shape = this.shapes[shapeIndex];
                 row.each(function(value) {
-                    var pointCenter = rowOrigin.x + rowCenter;
-                    var point = new Point(pointCenter, y - (value * this.ratio));
-                    shape(this.ctx, point.x, point.y, this.options.tickSize, this.colors[index]);
-                    
+                    if (value != null && value != undefined) {
+                        var pointCenter = rowOrigin.x + rowCenter;
+                        var point = new Point(pointCenter, y - (value * this.ratio));
+                        shape(this.ctx, point.x, point.y, this.options.tickSize, this.colors[index]);
+                    }
                     rowOrigin.x += this.rowWidth;
                     
                 }.bind(this));
@@ -825,7 +829,7 @@ MilkChart.Line = new Class({
             }
             
             if (this.options.showTicks) {
-            	shapeIndex = (shapeIndex > MilkChart.Shapes.getLength() - 1) ? 0 : shapeIndex;
+            	shapeIndex = (shapeIndex > Object.getLength(MilkChart.Shapes) - 1) ? 0 : shapeIndex;
                 var shape = this.shapes[shapeIndex];
                 shape(this.ctx, this.keyBounds[0].x + 10, keyOrigin, 10, this.colors[index % this.colors.length]);
                 shapeIndex++;
