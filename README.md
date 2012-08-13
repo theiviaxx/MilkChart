@@ -1,9 +1,6 @@
 MilkChart
 =========
 
-MilkChart is released under the MIT license. It is simple and easy to understand and places almost no restrictions on what you can do with MilkChart.
-[More Information](http://en.wikipedia.org/wiki/MIT_License)
-
 This library will generate a graph similar to Microsoft Excel.
 
 ![Screenshot](http://www.brettdixon.com/static/i/column.jpg)
@@ -11,38 +8,77 @@ This library will generate a graph similar to Microsoft Excel.
 How to use
 ----------
 
-To transform a table of data into a chart, simply create a MilkChart object of the chart type you wish passing in the table id and an object containing options for the chart.
+### The HTML Table Way ###
 
-Table structure:
+To transform a table of data into a chart, simply create a MilkChart object of the chart type you wish passing in the table id and an object containing options
+for the chart.
 
-	<table id="chart">
-	    <thead>
-	        <tr>
-	            <th>Column A</th><th>Column B</th><th>Column C</th><th>Column D</th> 
-	        </tr>
-	    </thead>
-	    <tbody>
-	        <tr><td>8.3</td><td>70</td><td>10.3</td><td>100</td></tr>
-	        <tr><td>8.6</td><td>65</td><td>10.3</td><td>125</td></tr>
-	        <tr><td>8.8</td><td>63</td><td>10.2</td><td>106</td></tr>
-	        <tr><td>10.5</td><td>72</td><td>16.4</td><td>162</td></tr>
-	        <tr><td>11.1</td><td>80</td><td>22.6</td><td>89</td></tr>
-	    
-	    </tbody>
-	    <tfoot>
-	        <tr>
-	            <td>Row 1</td><td>Row 2</td><td>Row 3</td><td>Row 4</td><td>Row 5</td>
-	        </tr>
-	    </tfoot>
-	</table>
-	
+HTML structure:
+
+    <table id="chart">
+        <thead>
+            <tr>
+                <th>Column A</th><th>Column B</th><th>Column C</th><th>Column D</th> 
+            </tr>
+        </thead>
+        <tbody>
+            <tr><td>8.3</td><td>70</td><td>10.3</td><td>100</td></tr>
+            <tr><td>8.6</td><td>65</td><td>10.3</td><td>125</td></tr>
+            <tr><td>8.8</td><td>63</td><td>10.2</td><td>106</td></tr>
+            <tr><td>10.5</td><td>72</td><td>16.4</td><td>162</td></tr>
+            <tr><td>11.1</td><td>80</td><td>22.6</td><td>89</td></tr>
+        
+        </tbody>
+        <tfoot>
+            <tr>
+                <td>Row 1</td><td>Row 2</td><td>Row 3</td><td>Row 4</td><td>Row 5</td>
+            </tr>
+        </tfoot>
+    </table>
+    
 * NOTE: The ``<tfoot>`` tag is optional.  This is where row names are stored.  If it's not important, they will be named Row # by default.
 
 The JavaScript:
 
-	window.addEvent('domready', function() {
-	    var chart = new MilkChart.Column("chart");
-	})
+    window.addEvent('domready', function() {
+        var chart = new MilkChart.Column("chart", options);
+    })
+    
+### The AJAX/JSON Way ###
+
+You can call the `load` method on any MilkChart type to load a JSON dataset from a url.  It accepts the same options as Request, except for onSuccess (which is
+used to draw the chart). The option *interval* is added, which when defined should be the number of milliseconds after which the url is rerequested and the
+chart redrawn.
+
+HTML:
+
+    <div id="chat" />
+    
+The JavaScript:
+
+    window.addEvent('domready', function() {
+        var chart = new MilkChart.Column("chart").load({
+            url: '/api/chart_data.php',
+            method: 'get'
+            /* optional
+            interval: 60000
+            */
+        });
+   })
+
+The response of the requested url must be structured like this:
+
+    {
+        "title": "My Chart",
+        "colNames": ["Internet Explorer", "FireFox"],
+        "rowNames": ["Q1", "Q2", "Q3", "Q4"],
+        "rows": [
+            [1,2],
+            [3,4],
+            [5,6],
+            [7,8]
+        ]
+    }
 
 MilkChart Options
 -----------------
@@ -94,21 +130,21 @@ These are the available classes MilkChart provides and their additional options.
   - chartLineWeight - (int: Defaults to 2) Outline line weight in px
   - pieBorder - (bool: Defaults to false) Draw a border around pie
 * Doughnut
-
-AJAX Loading(JSON)
-------------------
-You can call the `load` method on any MilkChart type to load a JSON dataset from a url.  It accepts the same options as Request, except for onSuccess.
   
 Chart Colors
 ------------
-For the chart colors, your can specify a list of colors and it will repeat those as needed.  You can also specify a single color and MilkChart will create a gradient as needed.  Or you can supply two colors to create a gradient between.
+For the chart colors, your can specify a list of colors and it will repeat those as needed.  You can also specify a single color and MilkChart will create a
+gradient as needed.  Or you can supply two colors to create a gradient between.
 
 Screenshots
 -----------
-
 ![Column Chart](http://www.brettdixon.com/static/i/column.jpg)
 ![Bar Chart](http://www.brettdixon.com/static/i/bar.jpg)
 ![Line Chart](http://www.brettdixon.com/static/i/line.jpg)
 ![Scatter Chart](http://www.brettdixon.com/static/i/scatter.jpg)
 ![Pie Chart](http://www.brettdixon.com/static/i/pie.jpg)
 ![Doughnut Chart](http://www.brettdixon.com/static/i/doughnut.jpg)
+
+License
+-------
+MilkChart is released under the [MIT](http://en.wikipedia.org/wiki/MIT_License) license.

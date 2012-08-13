@@ -21,10 +21,11 @@ license: MIT License
 
 authors:
 - Brett Dixon
+- Lars Kreisz
 
 requires: 
-- core/1.3.1: *
-- more/1.3.2: Color
+- core/1.4.1: Core
+- more/1.4.0.1: Color
 
 provides: [MilkChart.Column, MilkChart.Bar, MilkChart.Line, MilkChart.Scatter, MilkChart.Pie, MilkChart.Doughnut]
 
@@ -304,6 +305,13 @@ MilkChart.Base = new Class({
 		this.data = data
     },
     load: function(options) {
+    	// optional periodical reload
+        if (options.contains('interval')) {
+            var interval = options.remove('interval');
+            if (interval > 0) {
+                this.load.periocial(interval, this, [options]);
+            }
+        }
     	var self = this;
     	options = options || {};
     	var reqOptions = {
@@ -664,6 +672,13 @@ MilkChart.Line = new Class({
     },
     
     load: function(options) {
+    	// optional periodical reload
+        if (options.contains('interval')) {
+            var interval = options.remove('interval');
+            if (interval > 0) {
+                this.load.periocial(interval, this, [options]);
+            }
+        }
     	var self = this;
     	options = options || {};
     	var reqOptions = {
