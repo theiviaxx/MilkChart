@@ -152,14 +152,14 @@ provides: [MilkChart.Column, MilkChart.Bar, MilkChart.Line, MilkChart.Scatter, M
                     new Point(this.keyPadding, this.bounds[1].y)
                 ];
             }
-            
+            this.chartWidth = this.bounds[1].x - this.bounds[0].x;
             if (this.data.title) {
                 var titleHeight = this.bounds[0].y + this.height * 0.1;
                 this.bounds[0].y = titleHeight;
                 this.titleBounds = [new Point(this.bounds[0].x, 0), new Point(this.bounds[1].x, titleHeight)];
                 this.drawTitle();
             }
-            this.chartWidth = this.bounds[1].x - this.bounds[0].x;
+            
             if (this.options.showRowNames) {
                 this.ctx.font = this.options.fontSize + "px " + this.options.font;
                 this.getRowPadding();
