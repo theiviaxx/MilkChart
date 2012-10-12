@@ -1,7 +1,7 @@
 name: MilkChart
 author: theiviaxx
 category: Widgets
-tags: [chart, graph, canvas]
+tags: [chart, graph, canvas, table]
 docs: http://github.com/theiviaxx/MilkChart/wiki
 demo: http://www.brettdixon.com/demos/charts.html
 current: 1.5.5
