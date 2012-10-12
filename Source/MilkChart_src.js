@@ -223,6 +223,11 @@ provides: [MilkChart.Column, MilkChart.Bar, MilkChart.Line, MilkChart.Scatter, M
              *********************************/
             
             var dist = [1, 2, 5, 10, 20, 50, 100, 150, 500, 1000, 1500, 2000, 2500, 5000, 10000];
+            var maxdist = dist[dist.length - 1];
+            while (this.maxY > maxdist) {
+                maxdist += 10000;
+                dist.push(maxdist);
+            }
             var maxLines = 9;
             var i = 0;
             this.chartLines = 1;
@@ -570,6 +575,11 @@ provides: [MilkChart.Column, MilkChart.Bar, MilkChart.Line, MilkChart.Scatter, M
              * Draws horizontal value lines
              *********************************/
             var dist = [1, 2, 5, 10, 20, 50, 100, 150, 500, 1000, 1500, 2000, 2500, 5000, 10000];
+            var maxdist = dist[dist.length - 1];
+            while (this.maxY > maxdist) {
+                maxdist += 10000;
+                dist.push(maxdist);
+            }
             var maxLines = 9;
             var i = 0;
             this.chartLines = 1;
@@ -782,7 +792,7 @@ provides: [MilkChart.Column, MilkChart.Bar, MilkChart.Line, MilkChart.Scatter, M
                 if (this.options.showTicks) {
                     rowOrigin = new Point(origin.x, origin.y);
                     
-                    shapeIndex = (shapeIndex > MilkChart.Shapes.getLength() - 1) ? 0 : shapeIndex;
+                    shapeIndex = (shapeIndex > Object.getLength(MilkChart.Shapes) - 1) ? 0 : shapeIndex;
                     var shape = this.shapes[shapeIndex];
                     row.each(function(value) {
                         var pointCenter = rowOrigin.x + rowCenter;
@@ -823,7 +833,7 @@ provides: [MilkChart.Column, MilkChart.Bar, MilkChart.Line, MilkChart.Scatter, M
                 }
                 
                 if (this.options.showTicks) {
-                    shapeIndex = (shapeIndex > MilkChart.Shapes.getLength() - 1) ? 0 : shapeIndex;
+                    shapeIndex = (shapeIndex > Object.getLength(MilkChart.Shapes) - 1) ? 0 : shapeIndex;
                     var shape = this.shapes[shapeIndex];
                     shape(this.ctx, this.keyBounds[0].x + 10, keyOrigin, 10, this.colors[index % this.colors.length]);
                     shapeIndex++;
