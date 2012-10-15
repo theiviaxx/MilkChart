@@ -68,7 +68,8 @@ You can pass several ``options`` to the MilkChart chart object constructors. Eac
  * showKey - (bool: Defaults to true) Shows the column labels
  * useZero - (bool: Defaults to true) Always use 0 as the lowest value
  * copy - (bool: Defaults to false) Whether or not to hide the table or not
-
+ * clean - (bool: Defaults to false) Creates a copy of the table, cleaned of spurious elements added by Table.Paginate and/or Table.Sort. Automatically turned on if the supplied table's thead contains more than one row, as is when Table.Paginate is used.
+ 
 MilkChart Classes
 -----------------
 These are the available classes MilkChart provides and their additional options.
