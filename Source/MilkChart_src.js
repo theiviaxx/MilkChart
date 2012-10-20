@@ -72,13 +72,22 @@ provides: [MilkChart.Column, MilkChart.Bar, MilkChart.Line, MilkChart.Scatter, M
             useZero: true,
             copy: false,
             rowPrefix: "",
-            ignoreFirstColumn: false
+            ignoreFirstColumn: false,
+            clean: false // Create a copy of the table, cleaned of spurious elements added by Table.Paginate and/or Table.Sort. Automatically turned on if the thead contains more than one row, as is when Table.Paginate is used.
         },
         initialize: function(el, options) {
             this.setOptions(options);
             this.element = document.id(el);
             this.width = this.options.width;
             this.height = this.options.height;
+
+           if ((this.options.clean 
+           	   // If the thead has more than one child, Table.Paginate is here
+            	  || this.element.getChildren()[0].getChildren().length > 1
+            	) && this.element.get('tag') == "table") {
+    				this.element = this.getCleanedTable();
+            }
+
             this.container = (this.element.get('tag') == "table") ? new Element('div').inject(this.element.getParent()) : this.element;
             this.container.setStyles({width:this.width, height:this.height, display: 'inline-block'});
             this._canvas = new Element('canvas', {width:this.options.width,height:this.options.height}).inject(this.container);
@@ -107,6 +116,41 @@ provides: [MilkChart.Column, MilkChart.Bar, MilkChart.Line, MilkChart.Scatter, M
                 this.shapes.push(shape);
             }, this);
         },
+        
+        /* Return a new Table element, based on this.element,
+           but stripped of the divs and spans added by Table.Sort,
+           and Table.Paginate */
+        getCleanedTable: function(){
+			var c_table = new Element('table');
+			var c_thead = new Element('thead').inject(c_table);
+			var c_thead_row = new Element('tr').inject(c_thead);
+			var c_body = new Element('tbody').inject( c_table );
+			// Copy head - strip divs and spans inserted by sort
+			// Also, Paginate inserts a tr in thead
+			this.element.getChildren()[0].getLast().getChildren().each( function(cell){
+				c_thead_row.adopt( 
+					new Element('td',{text: cell.get('text') })
+				)
+			});
+			
+			// Import the rows
+			this.element.getChildren()[1].getChildren().each( function( row ){
+				var c_row = new Element('tr').inject(c_body);
+				row.getChildren().each( function(cell) {
+					c_row.adopt( 
+						new Element('td', { 
+							text:  cell.get('text') 
+						})
+					);
+				});
+			});
+			
+			// Table needs to be in the DOM
+			c_table.setStyle('display', 'none');
+			c_table.inject( document.body );
+        		return c_table;
+        },
+        
         prepareCanvas: function() {
             if (!this.options.copy && this.element.get('tag') == "table") {
                 this.element.setStyle('display', 'none');
