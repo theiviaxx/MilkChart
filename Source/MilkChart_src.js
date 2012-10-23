@@ -83,7 +83,7 @@ provides: [MilkChart.Column, MilkChart.Bar, MilkChart.Line, MilkChart.Scatter, M
 
            if ((this.options.clean 
            	   // If the thead has more than one child, Table.Paginate is here
-            	  || this.element.getChildren()[0].getChildren().length > 1
+            	  || (this.element.getChildren()[0] && this.element.getChildren()[0].getChildren().length > 1)
             	) && this.element.get('tag') == "table") {
     				this.element = this.getCleanedTable();
             }
@@ -218,7 +218,7 @@ provides: [MilkChart.Column, MilkChart.Bar, MilkChart.Line, MilkChart.Scatter, M
             this.colors = this.__getColors(this.options.colors);
         },
         getValueColumnWidth: function() {
-            return this.ctx.measureText(String(this.maxY)).width;
+            return this.ctx.measureText(String(this.maxY + 0.01)).width;
         },
         getRowPadding: function() {
             var rowNameLength = 0;
@@ -254,6 +254,55 @@ provides: [MilkChart.Column, MilkChart.Bar, MilkChart.Line, MilkChart.Scatter, M
             this.ctx.lineTo(this.bounds[1].x + 0.5, this.bounds[1].y + 0.5);
             this.ctx.stroke();
         },
+        __xAxisLabels: function(row,idx,rotateRowNames,origin) { // common for line and column charts
+          if (!this.skipLabel) this.skipLabel = 0;
+          this.ctx.fillStyle = this.options.fontColor;
+          this.ctx.lineWidth = 1;
+          this.ctx.textAlign = "center";
+          var rowText = MilkChart.escape(this.data.rowNames[idx]);
+          var drawLabel = true; // Draw row labels by default
+          if (this.options.skipLabel) {
+            if (this.skipLabel !== 0) drawLabel = false; // only draw row label every nth row
+            ++this.skipLabel;
+            if (this.skipLabel === this.options.skipLabel) this.skipLabel = 0;
+          }
+
+          var labelPadding = 4;
+          if (this.options && this.options.labelTicks) { // draw label ticks
+            this.ctx.save();
+            this.ctx.translate(parseInt(origin.x + this.rowWidth/2)+0.5, this.bounds[1].y+0.5 );
+            this.ctx.moveTo(0,0);
+            this.ctx.lineTo(0,4);
+            this.ctx.stroke();
+            this.ctx.restore();
+            labelPadding = 8; // increase y offset for labels to avoid ticks
+          }
+
+          if (drawLabel === true) { // render row text
+            if (rotateRowNames) {
+                this.ctx.save();
+                this.ctx.textAlign = "right";
+                this.ctx.translate(origin.x + this.rowWidth/2 + this.options.fontSize/2, this.bounds[1].y + labelPadding);
+                this.ctx.rotate(rotateRowNames);
+                if (this.data.rowNames.length * this.options.fontSize > this.chartWidth) {
+                    if (this.options.skipLabel || idx % divisor == 1) { // if skipLabel defined, let it determine whether to draw label
+                        if (this.options.type === 'column') {
+                          this.ctx.fillText(rowText, -(this.rowWidth), 0);
+                        } else {
+                          this.ctx.fillText(rowText, 0, 0);
+                        }
+                    }
+                }
+                else {
+                    this.ctx.fillText(rowText, 0, 0);
+                }
+                this.ctx.restore();
+            }
+            else {
+                this.ctx.fillText(rowText, origin.x+(this.rowWidth/2),this.bounds[1].y+(this.rowPadding/2));
+            }
+          }
+        },
         drawValueLines: function() {
             /**********************************
              * Draws horizontal value lines
@@ -266,50 +315,59 @@ provides: [MilkChart.Column, MilkChart.Bar, MilkChart.Line, MilkChart.Scatter, M
              * to the values in the table.
              *********************************/
             
-            var dist = [1, 2, 5, 10, 20, 50, 100, 150, 500, 1000, 1500, 2000, 2500, 5000, 10000];
-            var maxdist = dist[dist.length - 1];
-            while (this.maxY > maxdist) {
-                maxdist += 10000;
-                dist.push(maxdist);
+            var steps = [0.1, 0.2, 0.25, 0.5, 1, 2, 5, 10, 20, 50, 100, 150, 500, 1000, 1500, 2000, 2500, 5000, 10000]; // step sizes that we'll try to match to data
+            var maxstep = steps[steps.length - 1];
+
+            while (this.maxY > maxstep) {
+                maxstep += 10000;
+                steps.push(maxstep);
             }
             var maxLines = 9;
             var i = 0;
             this.chartLines = 1;
-            var delta = Math.floor((this.maxY - this.minY));
-            while (Math.floor((delta / dist[i])) > maxLines) {
-                i++;
-            }
-            this.chartLines = Math.floor((delta / dist[i])) + 2;
-            var mult = dist[i];
-            var negativeScale = (this.minY < 0) ? (mult + this.minY) : 0;
-            
-            // Set the bounds ratio
-            this.ratio = (this.chartHeight) / ((this.chartLines - 1) * mult);
-            
-            this.ctx.font = this.options.fontSize + "px " + this.options.font;
-            this.ctx.textAlign = "right";
-            this.ctx.fillStyle = this.options.fontColor;
-            
+            if (this.maxY == this.minY) this.maxY = 1; // default for charts with no data
+            var delta = this.maxY - this.minY;
+
+            var stepsize = false;
+            var stepcount = 0;
+            steps.each(function(step){
+              if (stepsize) return;
+              for (j=maxLines;j>4;j--) {
+                if (stepsize) return;
+                if (j * step >= delta) {
+                  stepsize = step;
+                }
+              }
+            });
+            this.minY = Math.floor(this.minY / stepsize) * stepsize; // get a nice upper boundry 
+            this.maxY = Math.ceil(this.maxY / stepsize) * stepsize; // get a nice lower boundry
+            for (j=this.minY;j<=this.maxY;j=j+stepsize) { // compute number of steps/lines
+              ++stepcount;
+            };
             var boundsHeight = this.bounds[1].y - this.bounds[0].y;
-            var lineHeight = Math.floor(boundsHeight / (this.chartLines - 1));
-            
-            for (i = 0; i < this.chartLines; i++) {
-                this.ctx.fillStyle = this.options.fontColor;
-                var lineY = this.bounds[1].y - (i * lineHeight);
-                
-                var lineValue = Math.round((this.chartLines * mult) - ((this.chartLines - i) * mult) + this.minY - negativeScale);
-                this.ctx.beginPath();
-                // Correct values for crisp lines
-                lineY += 0.5;
-                this.ctx.moveTo(this.bounds[0].x - 4, lineY);
-                if (this.options.showValues) {
-                    var offsetX = 8;
-                    var offsetY = 3
-                    this.ctx.fillText(String(lineValue), this.bounds[0].x - offsetX, lineY + offsetY);
-                }
-                this.ctx.lineTo(this.bounds[1].x, lineY);
-                this.ctx.stroke();
-                }
+            var boundsWidth = this.bounds[1].x - this.bounds[0].x;
+            var lineHeight = Math.floor(boundsHeight / (stepcount - 1));
+
+            // Set the bounds ratio.. ratio * value = number of pixels from y origin
+            this.ratio = lineHeight / stepsize;
+
+            this.ctx.fillStyle = this.options.fontColor;
+            var offsetX = this.options.rowTicks ? 4 : 0;
+            var k = 0;
+            for (j=this.minY;j<=this.maxY;j=j+stepsize){
+              j = parseInt(j * 100) / 100;
+              var yPos = this.bounds[1].y + 0.5 - k * lineHeight;
+              if (this.options.showValues) {
+                this.ctx.textAlign = "right";
+                this.ctx.fillText(String(j), this.bounds[0].x - 2 - offsetX, (yPos + 3));
+              }
+              this.ctx.beginPath();
+              this.ctx.moveTo(this.bounds[0].x - offsetX,yPos);
+              this.ctx.lineTo(this.bounds[1].x, yPos);
+              this.ctx.stroke();
+              this.ctx.moveTo(this.bounds[0].x,this.bounds[1].y + 0.5 + j * lineHeight);
+              ++k;
+            }
         },
         swapAxes: function() {
             var row = this.data.rowNames.slice(0);
@@ -449,7 +507,12 @@ provides: [MilkChart.Column, MilkChart.Bar, MilkChart.Line, MilkChart.Scatter, M
         options: {
             columnBorder: false,
             columnBorderWeight: 2,
-            columnBorderColor: '#ffffff'
+            columnBorderColor: '#ffffff',
+            skipLabel: 0,
+            labelTicks: false,
+            rowTicks: true,
+            rotateLabels: 0,
+            type: 'column'
         },
         initialize: function(el, options) {
             this.parent(el, options);
@@ -527,47 +590,36 @@ provides: [MilkChart.Column, MilkChart.Bar, MilkChart.Line, MilkChart.Scatter, M
             var origin = new Point(this.bounds[0].x, y);
             var rowPadding = Math.floor(this.rowWidth * 0.16);
             var colWidth = Math.ceil((this.rowWidth - (rowPadding*2)) / this.data.rows[0].length);
+
             // Should we rotate row names?
-            var rotateRowNames = (this.ctx.measureText(this.longestRowName).width > this.rowWidth);
-            var divisor = ((this.data.rows.length * this.options.fontSize) / this.chartWidth) / 2;
+            var rotateRowNames = (this.ctx.measureText(this.longestRowName).width > this.rowWidth) ? -1.57079633 : 0;
+            var divisor = Math.floor((this.data.rowNames.length * this.options.fontSize) / (this.chartWidth / 2));
+            if (this.options.rotateLabels) rotateRowNames = this.options.rotateLabels * Math.PI * -1 / 180; // label rotation forced
+            
+            this.ctx.strokeStyle = this.options.chartLineColor; // for labelTicks
+            this.ctx.strokeWeight = 1; // for labelTicks
             
             this.data.rows.each(function(row, idx) {
-                var rowOrigin = new Point(origin.x, origin.y);
-                this.ctx.fillStyle = this.options.fontColor;
-                this.ctx.textAlign = "center";
-                if (this.options.showRowNames) {
-                    var rowText = MilkChart.escape(this.data.rowNames[idx]);
-                    if (rotateRowNames) {
-                        this.ctx.save();
-                        this.ctx.textAlign = "right";
-                        this.ctx.translate(rowOrigin.x+(this.rowWidth/2) + this.options.fontSize, this.bounds[1].y + 4);
-                        this.ctx.rotate(-1.57079633);
-                        if (this.data.rows.length * this.options.fontSize > this.chartWidth) {
-                            if (idx % divisor == 1) {
-                                this.ctx.fillText(rowText, 0, 0);
-                            }
-                        }
-                        else {
-                            this.ctx.fillText(rowText, 0, 0);
-                        }
-                        this.ctx.restore();
-                    }
-                    else {
-                        this.ctx.fillText(rowText, rowOrigin.x+(this.rowWidth/2),this.bounds[1].y+(this.rowPadding/2));
-                    }
-                }
+                this.__xAxisLabels(row,idx,rotateRowNames,origin);
+                // originY = bottom of rectangle
+                var originY = this.bounds[1].y - this.minY * this.ratio;  // x axis starts at 0
+                if (this.minY < 0) originY = this.bounds[1].y + this.minY * this.ratio;  // x axis starts below 0
+                if (this.minY > 0) originY = this.bounds[1].y + this.minY * this.ratio;  // x axis starts above 0
+                if (this.minY > 0) originY = this.bounds[1].y;  // x axis starts above 0
+                var rowOrigin = new Point(origin.x, originY);
                 
                 row.each(function(value, colorIndex) {
                     this.ctx.beginPath();
                     this.ctx.fillStyle = this.colors[colorIndex % this.colors.length];
-                    var colHeight = Math.ceil(value*this.ratio) - 1; // 1 pixel for value line
-                    //console.log(colHeight);
+                    var delta = value - this.minY;
+                    var colHeight = Math.ceil(delta*this.ratio + this.minY*this.ratio) - 1; // 1 pixel for value line
+                    if (this.minY > 0) colHeight = Math.ceil(delta*this.ratio) - 1; // 0 is not present on axis
                     this.ctx.fillStyle = this.colors[colorIndex];
                     this.ctx.fillRect(rowOrigin.x+rowPadding, rowOrigin.y-colHeight, colWidth, colHeight);
                     if (this.options.columnBorder) {
                         this.ctx.strokeStyle = this.options.columnBorderColor;
                         this.ctx.lineWidth = this.options.columnBorderWeight;
-                        this.ctx.strokeRect(rowOrigin.x+rowPadding, rowOrigin.y-colHeight, colWidth, colHeight);
+                        this.ctx.strokeRect(origin.x+rowPadding, rowOrigin.y-colHeight, colWidth, colHeight);
                     }
                     
                     rowOrigin.x += colWidth;
@@ -711,7 +763,11 @@ provides: [MilkChart.Column, MilkChart.Bar, MilkChart.Line, MilkChart.Scatter, M
             showTicks: false,
             showLines: true,
             tickSize: 10,
-            lineWeight: 3
+            lineWeight: 3,
+            skipLabel: 0,
+            labelTicks: false,
+            rowTicks: true,
+            rotateLabels: 0,
         },
         
         load: function(options) {
@@ -788,7 +844,8 @@ provides: [MilkChart.Column, MilkChart.Bar, MilkChart.Line, MilkChart.Scatter, M
                     if (val > this.maxY) this.maxY = val;
                     if (val < this.minY) this.minY = val;
                 }.bind(this));
-                
+                this.maxY = Math.ceil(this.maxY);
+                this.minY = Math.floor(this.minY);
             }.bind(this));
             
             // Get the first element as row name
@@ -807,7 +864,11 @@ provides: [MilkChart.Column, MilkChart.Bar, MilkChart.Line, MilkChart.Scatter, M
             /*************************************
              * Draws the graph
              ************************************/
-            var origin = new Point(this.bounds[0].x, this.bounds[1].y);
+            this.__drawRowLabels(); // draw labels before content - keeps ticks (if enabled) behind graph lines
+            var originY = this.bounds[1].y - this.minY * this.ratio;  // x axis starts at 0
+            if (this.minY < 0) originY = this.bounds[1].y + this.minY * this.ratio;  // x axis starts below 0
+            if (this.minY > 0) originY = this.bounds[1].y + this.minY * this.ratio;  // x axis starts above 0
+            var origin = new Point(this.bounds[0].x, originY);
             var rowCenter = this.rowWidth / 2;
             var rowNameID = 0;
             var colorID = 0;
@@ -825,7 +886,7 @@ provides: [MilkChart.Column, MilkChart.Bar, MilkChart.Line, MilkChart.Scatter, M
                     this.ctx.moveTo(rowOrigin.x+rowCenter, y - (row[0] * this.ratio));
                     row.each(function(value) {
                         var pointCenter = rowOrigin.x + rowCenter;
-                        var point = new Point(pointCenter, y - (value * this.ratio));
+                        var point = new Point(pointCenter, origin.y - (value * this.ratio) + 0.5);
                         this.ctx.lineTo(point.x, point.y);
                         rowOrigin.x += this.rowWidth;
                         
@@ -852,7 +913,6 @@ provides: [MilkChart.Column, MilkChart.Bar, MilkChart.Line, MilkChart.Scatter, M
                 colorID++;
                 rowNameID++;
             }.bind(this));
-            this.__drawRowLabels();
         },
         drawKey: function() {
             var keyNameHeight = Math.ceil(this.height * 0.05);
@@ -863,7 +923,7 @@ provides: [MilkChart.Column, MilkChart.Bar, MilkChart.Line, MilkChart.Scatter, M
             this.data.colNames.each(function(item, index) {
                 this.ctx.fillStyle = this.options.fontColor;
                 this.ctx.textAlign = "left";
-                this.ctx.fillText(MilkChart.escape(item), this.keyBounds[0].x + 30, keyOrigin+5);
+                this.ctx.fillText(MilkChart.escape(item), this.keyBounds[0].x + 25, keyOrigin+5);
                 this.ctx.fillStyle = this.colors[index % this.colors.length];
                 this.ctx.strokeStyle = this.colors[index % this.colors.length];
                 this.ctx.lineWidth = 3;
@@ -890,38 +950,15 @@ provides: [MilkChart.Column, MilkChart.Bar, MilkChart.Line, MilkChart.Scatter, M
             var origin = new Point(this.bounds[0].x, this.bounds[1].y);
             
             // Should we rotate row names?
-            var rotateRowNames = (this.ctx.measureText(this.longestRowName).width > this.rowWidth);
+            var rotateRowNames = (this.ctx.measureText(this.longestRowName).width > this.rowWidth) ? -1.57079633 : 0;
             var divisor = Math.floor((this.data.rowNames.length * this.options.fontSize) / (this.chartWidth / 2));
-            
-            this.ctx.fillStyle = this.options.fontColor;
-            this.ctx.lineWidth = 1;
-            this.ctx.textAlign = "center";
+            if (this.options.rotateLabels) rotateRowNames = this.options.rotateLabels * Math.PI * -1 / 180; // label rotation forced
             
             this.data.rowNames.each(function(item, idx) {
-                // Draw row labels
-                var rowText = MilkChart.escape(this.data.rowNames[idx]);
-                if (rotateRowNames) {
-                    this.ctx.save();
-                    this.ctx.textAlign = "right";
-                    this.ctx.translate(origin.x+(this.rowWidth/2) + this.options.fontSize, this.bounds[1].y + 4);
-                    this.ctx.rotate(-1.57079633);
-                    if (this.data.rowNames.length * this.options.fontSize > this.chartWidth) {
-                        if (idx % divisor == 1) {
-                            this.ctx.fillText(rowText, 0, 0);
-                        }
-                    }
-                    else {
-                        this.ctx.fillText(rowText, 0, 0);
-                    }
-                    this.ctx.restore();
-                }
-                else {
-                    this.ctx.fillText(rowText, origin.x+(this.rowWidth/2),this.bounds[1].y+(this.rowPadding/2));
-                }
-                origin.x += this.rowWidth;
+              this.__xAxisLabels(item,idx,rotateRowNames,origin);
+              origin.x += this.rowWidth;
             }.bind(this));
         }
-        
     });
     
     MilkChart.Scatter = new Class({
