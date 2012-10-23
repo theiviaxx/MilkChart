@@ -81,14 +81,17 @@ provides: [MilkChart.Column, MilkChart.Bar, MilkChart.Line, MilkChart.Scatter, M
             this.width = this.options.width;
             this.height = this.options.height;
 
-           if ((this.options.clean 
-           	   // If the thead has more than one child, Table.Paginate is here
-            	  || (this.element.getChildren()[0] && this.element.getChildren()[0].getChildren().length > 1)
-            	) && this.element.get('tag') == "table") {
-    				this.element = this.getCleanedTable();
+            if (this.options.clean || !this.isClean()) {
+                this.element = this.getCleanedTable();
             }
 
-            this.container = (this.element.get('tag') == "table") ? new Element('div').inject(this.element.getParent()) : this.element;
+            if (this.element.get('tag') === 'table') {
+                this.container = new Element('div').inject(this.element.getParent());
+            }
+            else {
+                this.container = this.element;
+            }
+
             this.container.setStyles({width:this.width, height:this.height, display: 'inline-block'});
             this._canvas = new Element('canvas', {width:this.options.width,height:this.options.height}).inject(this.container);
             this.ctx = this._canvas.getContext('2d');
@@ -116,41 +119,49 @@ provides: [MilkChart.Column, MilkChart.Bar, MilkChart.Line, MilkChart.Scatter, M
                 this.shapes.push(shape);
             }, this);
         },
-        
-        /* Return a new Table element, based on this.element,
-           but stripped of the divs and spans added by Table.Sort,
-           and Table.Paginate */
-        getCleanedTable: function(){
-			var c_table = new Element('table');
-			var c_thead = new Element('thead').inject(c_table);
-			var c_thead_row = new Element('tr').inject(c_thead);
-			var c_body = new Element('tbody').inject( c_table );
-			// Copy head - strip divs and spans inserted by sort
-			// Also, Paginate inserts a tr in thead
-			this.element.getChildren()[0].getLast().getChildren().each( function(cell){
-				c_thead_row.adopt( 
-					new Element('td',{text: cell.get('text') })
-				)
-			});
-			
-			// Import the rows
-			this.element.getChildren()[1].getChildren().each( function( row ){
-				var c_row = new Element('tr').inject(c_body);
-				row.getChildren().each( function(cell) {
-					c_row.adopt( 
-						new Element('td', { 
-							text:  cell.get('text') 
-						})
-					);
-				});
-			});
-			
-			// Table needs to be in the DOM
-			c_table.setStyle('display', 'none');
-			c_table.inject( document.body );
-        		return c_table;
+        isClean: function() {
+            // -- Determines if the table needs to be rebuilt due to sort or paginate
+            var clean = true;
+            if (this.element.get('tag') === 'table') {
+                if (this.element.tHead) {
+                    clean = this.element.tHead.getChildren().length === 1;
+                }
+            }
+
+            return clean;
         },
-        
+        getCleanedTable: function() {
+            /*
+            * Return a new Table element, based on this.element, but stripped of the 
+            * divs and spans added by Table.Sort, and Table.Paginate
+            */
+            var table = new Element('table');
+            var thead = new Element('thead').inject(table);
+            var theadRow = new Element('tr').inject(thead);
+            var body = new Element('tbody').inject(table);
+            // Copy head - strip divs and spans inserted by sort
+            // Also, Paginate inserts a tr in thead
+            this.element.getChildren()[0].getLast().getChildren().each(function(cell){
+                theadRow.adopt( 
+                    new Element('td',{text: cell.get('text') })
+                )
+            });
+            
+            // Import the rows
+            this.element.getChildren()[1].getChildren().each(function(row) {
+                var row = new Element('tr').inject(body);
+                row.getChildren().each(function(cell) {
+                    var el = new Element('td', {text: cell.get('text')});
+                    row.adopt(el);
+                });
+            });
+            
+            // Table needs to be in the DOM
+            table.setStyle('display', 'none');
+            table.inject(this.element.getParent());
+            
+            return table;
+        },
         prepareCanvas: function() {
             if (!this.options.copy && this.element.get('tag') == "table") {
                 this.element.setStyle('display', 'none');
@@ -254,54 +265,79 @@ provides: [MilkChart.Column, MilkChart.Bar, MilkChart.Line, MilkChart.Scatter, M
             this.ctx.lineTo(this.bounds[1].x + 0.5, this.bounds[1].y + 0.5);
             this.ctx.stroke();
         },
-        __xAxisLabels: function(row,idx,rotateRowNames,origin) { // common for line and column charts
-          if (!this.skipLabel) this.skipLabel = 0;
-          this.ctx.fillStyle = this.options.fontColor;
-          this.ctx.lineWidth = 1;
-          this.ctx.textAlign = "center";
-          var rowText = MilkChart.escape(this.data.rowNames[idx]);
-          var drawLabel = true; // Draw row labels by default
-          if (this.options.skipLabel) {
-            if (this.skipLabel !== 0) drawLabel = false; // only draw row label every nth row
-            ++this.skipLabel;
-            if (this.skipLabel === this.options.skipLabel) this.skipLabel = 0;
-          }
+        __xAxisLabels: function(row, idx, rotateRowNames, origin) {
+            /**********************************
+             * Draws value labels along the X Axis
+             * common for line and column charts
+             *
+             * Draws labels as necessary and will rotate or skip values based on
+             * options provided to the constructor.
+             *********************************/
 
-          var labelPadding = 4;
-          if (this.options && this.options.labelTicks) { // draw label ticks
-            this.ctx.save();
-            this.ctx.translate(parseInt(origin.x + this.rowWidth/2)+0.5, this.bounds[1].y+0.5 );
-            this.ctx.moveTo(0,0);
-            this.ctx.lineTo(0,4);
-            this.ctx.stroke();
-            this.ctx.restore();
-            labelPadding = 8; // increase y offset for labels to avoid ticks
-          }
+            var skipLabel = 0;
+            var rowText = MilkChart.escape(this.data.rowNames[idx]);
+            var drawLabel = true;
+            var labelPadding = 4;
+            var divisor = Math.floor((this.data.rowNames.length * this.options.fontSize) / (this.chartWidth / 2));
 
-          if (drawLabel === true) { // render row text
-            if (rotateRowNames) {
+            this.ctx.fillStyle = this.options.fontColor;
+            this.ctx.lineWidth = 1;
+            this.ctx.textAlign = "center";
+            
+            if (this.options.skipLabel) {
+                if (skipLabel !== 0) {
+                    // only draw row label every nth row
+                    drawLabel = false;
+                }
+                ++skipLabel;
+                if (skipLabel === this.options.skipLabel) {
+                    skipLabel = 0;
+                }
+            }
+
+            // draw label ticks
+            if (this.options && this.options.labelTicks) {
                 this.ctx.save();
-                this.ctx.textAlign = "right";
-                this.ctx.translate(origin.x + this.rowWidth/2 + this.options.fontSize/2, this.bounds[1].y + labelPadding);
-                this.ctx.rotate(rotateRowNames);
-                if (this.data.rowNames.length * this.options.fontSize > this.chartWidth) {
-                    if (this.options.skipLabel || idx % divisor == 1) { // if skipLabel defined, let it determine whether to draw label
-                        if (this.options.type === 'column') {
-                          this.ctx.fillText(rowText, -(this.rowWidth), 0);
-                        } else {
-                          this.ctx.fillText(rowText, 0, 0);
+                this.ctx.translate(parseInt(origin.x + this.rowWidth / 2) + 0.5, this.bounds[1].y + 0.5);
+                this.ctx.moveTo(0,0);
+                this.ctx.lineTo(0,4);
+                this.ctx.stroke();
+                this.ctx.restore();
+                // increase y offset for labels to avoid ticks
+                labelPadding = 8;
+            }
+
+            // render row text
+            if (drawLabel === true) {
+                if (rotateRowNames !== 0) {
+                    this.ctx.save();
+                    this.ctx.textAlign = "right";
+                    
+                    var deltaX = origin.x + this.rowWidth / 2 + this.options.fontSize / 2;
+                    var deltaY = this.bounds[1].y + labelPadding
+                    this.ctx.translate(deltaX, deltaY);
+                    
+                    this.ctx.rotate(rotateRowNames);
+                    if (this.data.rowNames.length * this.options.fontSize > this.chartWidth) {
+                        // if skipLabel defined, let it determine whether to draw label
+                        if (this.options.skipLabel || idx % divisor == 1) {
+                            if (this.options.type === 'column') {
+                                this.ctx.fillText(rowText, -(this.rowWidth), 0);
+                            }
+                            else {
+                                this.ctx.fillText(rowText, 0, 0);
+                            }
                         }
                     }
+                    else {
+                        this.ctx.fillText(rowText, 0, 0);
+                    }
+                    this.ctx.restore();
                 }
                 else {
-                    this.ctx.fillText(rowText, 0, 0);
+                    this.ctx.fillText(rowText, origin.x + (this.rowWidth / 2), this.bounds[1].y + (this.rowPadding / 2));
                 }
-                this.ctx.restore();
             }
-            else {
-                this.ctx.fillText(rowText, origin.x+(this.rowWidth/2),this.bounds[1].y+(this.rowPadding/2));
-            }
-          }
         },
         drawValueLines: function() {
             /**********************************
@@ -919,11 +955,12 @@ provides: [MilkChart.Column, MilkChart.Bar, MilkChart.Line, MilkChart.Scatter, M
             var keyHeight = this.data.colNames.length * keyNameHeight;
             var keyOrigin = (this.height - keyHeight) / 2;
             var shapeIndex = 0;
+            var textPadding = 25;
             
             this.data.colNames.each(function(item, index) {
                 this.ctx.fillStyle = this.options.fontColor;
                 this.ctx.textAlign = "left";
-                this.ctx.fillText(MilkChart.escape(item), this.keyBounds[0].x + 25, keyOrigin+5);
+                this.ctx.fillText(MilkChart.escape(item), this.keyBounds[0].x + textPadding, keyOrigin + 5);
                 this.ctx.fillStyle = this.colors[index % this.colors.length];
                 this.ctx.strokeStyle = this.colors[index % this.colors.length];
                 this.ctx.lineWidth = 3;
