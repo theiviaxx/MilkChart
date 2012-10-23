@@ -81,6 +81,7 @@ These are the available classes MilkChart provides and their additional options.
   - skipLabel  - (int: Defaults to 0) Display every Nth label
   - labelTicks - (bool:Defaults to false) Draw tick marks on the X-axis
   - rotateLabels - (int: Defaults to 0) Force rotation of label text. 65, 90, and 115 produce nice looking results
+  - rowTicks - (bool:Defaults to true) Draw tick marks on the Y-axis
 * Bar
 * Line
   - showTicks - (bool:Defaults to false) Draw tick marks at each value
@@ -89,6 +90,7 @@ These are the available classes MilkChart provides and their additional options.
   - skipLabel  - (int: Defaults to 0) Display every Nth label
   - labelTicks - (bool:Defaults to false) Draw tick marks on the X-axis
   - rotateLabels - (int: Defaults to 0) Force rotation of label text. 65, 90, and 115 produce nice looking results
+  - rowTicks - (bool:Defaults to true) Draw tick marks on the Y-axis
 * Scatter
   - showTicks - (bool:Defaults to true) Draw tick marks at each value
   - showLines - (bool:Defaults to false) Draw lines connecting values

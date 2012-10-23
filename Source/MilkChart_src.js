@@ -510,7 +510,7 @@ provides: [MilkChart.Column, MilkChart.Bar, MilkChart.Line, MilkChart.Scatter, M
             columnBorderColor: '#ffffff',
             skipLabel: 0,
             labelTicks: false,
-            rowTicks: false,
+            rowTicks: true,
             rotateLabels: 0,
             type: 'column'
         },
@@ -766,7 +766,7 @@ provides: [MilkChart.Column, MilkChart.Bar, MilkChart.Line, MilkChart.Scatter, M
             lineWeight: 3,
             skipLabel: 0,
             labelTicks: false,
-            rowTicks: false,
+            rowTicks: true,
             rotateLabels: 0,
         },
         
