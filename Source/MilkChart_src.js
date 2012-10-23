@@ -268,7 +268,7 @@ provides: [MilkChart.Column, MilkChart.Bar, MilkChart.Line, MilkChart.Scatter, M
           }
 
           var labelPadding = 4;
-          if (this.options.labelTicks) { // draw label ticks
+          if (this.options && this.options.labelTicks) { // draw label ticks
             this.ctx.save();
             this.ctx.translate(parseInt(origin.x + this.rowWidth/2)+0.5, this.bounds[1].y+0.5 );
             this.ctx.moveTo(0,0);
@@ -286,7 +286,7 @@ provides: [MilkChart.Column, MilkChart.Bar, MilkChart.Line, MilkChart.Scatter, M
                 this.ctx.rotate(rotateRowNames);
                 if (this.data.rowNames.length * this.options.fontSize > this.chartWidth) {
                     if (this.options.skipLabel || idx % divisor == 1) { // if skipLabel defined, let it determine whether to draw label
-                        if (this.option.type === 'column') {
+                        if (this.options.type === 'column') {
                           this.ctx.fillText(rowText, -(this.rowWidth), 0);
                         } else {
                           this.ctx.fillText(rowText, 0, 0);
