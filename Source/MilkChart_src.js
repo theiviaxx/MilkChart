@@ -48,7 +48,7 @@ provides: [MilkChart.Column, MilkChart.Bar, MilkChart.Line, MilkChart.Scatter, M
     
     
     MilkChart.Base = new Class({
-        Implements: [Options,Events],
+        Implements: [Options, Events],
         options: {
             width: 480,
             height: 290,
@@ -447,17 +447,20 @@ provides: [MilkChart.Column, MilkChart.Bar, MilkChart.Line, MilkChart.Scatter, M
         },
         load: function(options) {
             var self = this;
-            options = options || {};
+            var defaults = {
+                onLoad: function(data) { return data; },
+            }
+            options = Object.merge(defaults, options || {});
             var reqOptions = {
-                method: 'get',
                 onSuccess: function(res) {
-                    self.setData(res);
+                    var data = options.onLoad(res);
+                    self.setData(data);
                     self.render();
                 }
             };
             var merged = Object.merge(options, reqOptions);
             var req = new Request.JSON(merged);
-            req.send();
+            req.GET();
             
             return req;
         },
