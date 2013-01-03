@@ -75,6 +75,9 @@ provides: [MilkChart.Column, MilkChart.Bar, MilkChart.Line, MilkChart.Scatter, M
             ignoreFirstColumn: false,
             clean: false // Create a copy of the table, cleaned of spurious elements added by Table.Paginate and/or Table.Sort. Automatically turned on if the thead contains more than one row, as is when Table.Paginate is used.
         },
+        state: {
+            skipLabel: 0
+        },
         initialize: function(el, options) {
             this.setOptions(options);
             this.element = document.id(el);
@@ -265,7 +268,7 @@ provides: [MilkChart.Column, MilkChart.Bar, MilkChart.Line, MilkChart.Scatter, M
             this.ctx.lineTo(this.bounds[1].x + 0.5, this.bounds[1].y + 0.5);
             this.ctx.stroke();
         },
-        __xAxisLabels: function(row, idx, rotateRowNames, origin) {
+        __xAxisLabels: function(idx, rotateRowNames, origin) {
             /**********************************
              * Draws value labels along the X Axis
              * common for line and column charts
@@ -274,7 +277,6 @@ provides: [MilkChart.Column, MilkChart.Bar, MilkChart.Line, MilkChart.Scatter, M
              * options provided to the constructor.
              *********************************/
 
-            var skipLabel = 0;
             var rowText = MilkChart.escape(this.data.rowNames[idx]);
             var drawLabel = true;
             var labelPadding = 4;
@@ -285,13 +287,13 @@ provides: [MilkChart.Column, MilkChart.Bar, MilkChart.Line, MilkChart.Scatter, M
             this.ctx.textAlign = "center";
             
             if (this.options.skipLabel) {
-                if (skipLabel !== 0) {
+                if (this.state.skipLabel !== 0) {
                     // only draw row label every nth row
                     drawLabel = false;
                 }
-                ++skipLabel;
-                if (skipLabel === this.options.skipLabel) {
-                    skipLabel = 0;
+                ++this.state.skipLabel;
+                if (this.state.skipLabel === this.options.skipLabel) {
+                    this.state.skipLabel = 0;
                 }
             }
 
@@ -635,11 +637,8 @@ provides: [MilkChart.Column, MilkChart.Bar, MilkChart.Line, MilkChart.Scatter, M
             var divisor = Math.floor((this.data.rowNames.length * this.options.fontSize) / (this.chartWidth / 2));
             if (this.options.rotateLabels) rotateRowNames = this.options.rotateLabels * Math.PI * -1 / 180; // label rotation forced
             
-            this.ctx.strokeStyle = this.options.chartLineColor; // for labelTicks
-            this.ctx.strokeWeight = 1; // for labelTicks
-            
             this.data.rows.each(function(row, idx) {
-                this.__xAxisLabels(row,idx,rotateRowNames,origin);
+                this.__xAxisLabels(idx,rotateRowNames,origin);
                 // originY = bottom of rectangle
                 var originY = this.bounds[1].y - this.minY * this.ratio;  // x axis starts at 0
                 if (this.minY < 0) originY = this.bounds[1].y + this.minY * this.ratio;  // x axis starts below 0
@@ -995,8 +994,8 @@ provides: [MilkChart.Column, MilkChart.Bar, MilkChart.Line, MilkChart.Scatter, M
             if (this.options.rotateLabels) rotateRowNames = this.options.rotateLabels * Math.PI * -1 / 180; // label rotation forced
             
             this.data.rowNames.each(function(item, idx) {
-              this.__xAxisLabels(item,idx,rotateRowNames,origin);
-              origin.x += this.rowWidth;
+                this.__xAxisLabels(idx,rotateRowNames,origin);
+                origin.x += this.rowWidth;
             }.bind(this));
         }
     });
