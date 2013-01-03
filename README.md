@@ -107,6 +107,12 @@ These are the available classes MilkChart provides and their additional options.
 AJAX Loading(JSON)
 ------------------
 You can call the `load` method on any MilkChart type to load a JSON dataset from a url.  It accepts the same options as Request, except for onSuccess.
+
+There is now an onLoad option to pass to .load().  This function recieves the JSON object from the request and needs to return an object.  The purpose of this is to allow the developer to modify the data on the client rather than make the server return a specific JSON signature.  It should allow for more generic APIs to remain generic.  The default is:
+
+    function(data) {
+        return data;
+    }
   
 Chart Colors
 ------------
