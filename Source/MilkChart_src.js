@@ -810,10 +810,14 @@ provides: [MilkChart.Column, MilkChart.Bar, MilkChart.Line, MilkChart.Scatter, M
         
         load: function(options) {
             var self = this;
-            options = options || {};
+            var defaults = {
+                onLoad: function(data) { return data; },
+            }
+            options = Object.merge(defaults, options || {});
             var reqOptions = {
                 noCache: true,
-                onSuccess: function(data) {
+                onSuccess: function(res) {
+                    var data = options.onLoad(res);
                     var newRows = [];
                     data.rows.each(function(row, idx) {
                         row.each(function(cell, index) {
@@ -826,14 +830,13 @@ provides: [MilkChart.Column, MilkChart.Bar, MilkChart.Line, MilkChart.Scatter, M
                     data.rows = newRows;
                     self.setData(data);
                     self.render();
-                },
-                onError: function() {
-                    
                 }
             };
             var merged = Object.merge(options, reqOptions);
             var req = new Request.JSON(merged);
-            req.send();
+            req.GET();
+            
+            return req;
         },
         render: function() {
             this.ctx.save();
