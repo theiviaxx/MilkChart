@@ -83,6 +83,8 @@ provides: [MilkChart.Column, MilkChart.Bar, MilkChart.Line, MilkChart.Scatter, M
             this.element = document.id(el);
             this.width = this.options.width;
             this.height = this.options.height;
+            // -- Fix the pixel offset
+            this.options.padding += 0.5;
 
             if (this.options.clean || !this.isClean()) {
                 this.element = this.getCleanedTable();
@@ -189,8 +191,8 @@ provides: [MilkChart.Column, MilkChart.Bar, MilkChart.Line, MilkChart.Scatter, M
             
             this.bounds[0].x += this.options.padding;
             this.bounds[0].y += this.options.padding;
-            this.bounds[1].x -= this.options.padding*2;
-            this.bounds[1].y -= this.options.padding*2;
+            this.bounds[1].x -= this.options.padding * 2;
+            this.bounds[1].y -= this.options.padding * 2;
             
             if (this.options.showKey) {
                 // Apply key padding
@@ -777,7 +779,7 @@ provides: [MilkChart.Column, MilkChart.Bar, MilkChart.Line, MilkChart.Scatter, M
                     this.ctx.beginPath();
                     this.ctx.fillStyle = this.colors[colorID];
                     var colHeight = Math.ceil(value*this.ratio);
-                    this.ctx.fillRect(rowOrigin.x, rowOrigin.y-rowPadding, colHeight, colWidth);
+                    this.ctx.fillRect(rowOrigin.x, rowOrigin.y - this.rowPadding, colHeight, colWidth);
                     rowOrigin.y -= colWidth;
                     colorID++;
                 }.bind(this));
@@ -997,7 +999,7 @@ provides: [MilkChart.Column, MilkChart.Bar, MilkChart.Line, MilkChart.Scatter, M
             if (this.options.rotateLabels) rotateRowNames = this.options.rotateLabels * Math.PI * -1 / 180; // label rotation forced
             
             this.data.rowNames.each(function(item, idx) {
-                this.__xAxisLabels(idx,rotateRowNames,origin);
+                this.__xAxisLabels(idx, rotateRowNames, origin);
                 origin.x += this.rowWidth;
             }.bind(this));
         }
