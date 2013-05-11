@@ -85,6 +85,7 @@ provides: [MilkChart.Column, MilkChart.Bar, MilkChart.Line, MilkChart.Scatter, M
             this.height = this.options.height;
             // -- Fix the pixel offset
             this.options.padding += 0.5;
+            this.displayUnit = '';
 
             if (this.options.clean || !this.isClean()) {
                 this.element = this.getCleanedTable();
@@ -237,7 +238,8 @@ provides: [MilkChart.Column, MilkChart.Bar, MilkChart.Line, MilkChart.Scatter, M
             this.colors = this.__getColors(this.options.colors);
         },
         getValueColumnWidth: function() {
-            return this.ctx.measureText(String(this.maxY + 0.01)).width;
+            var str = String(this.maxY + 0.01) + this.displayUnit;
+            return this.ctx.measureText(str).width;
         },
         getRowPadding: function() {
             var rowNameLength = 0;
@@ -402,7 +404,7 @@ provides: [MilkChart.Column, MilkChart.Bar, MilkChart.Line, MilkChart.Scatter, M
               var yPos = this.bounds[1].y + 0.5 - k * lineHeight;
               if (this.options.showValues) {
                 this.ctx.textAlign = "right";
-                this.ctx.fillText(String(j), this.bounds[0].x - 2 - offsetX, (yPos + 3));
+                this.ctx.fillText(String(j) + this.displayUnit, this.bounds[0].x - 2 - offsetX, (yPos + 3));
               }
               this.ctx.beginPath();
               this.ctx.moveTo(this.bounds[0].x - offsetX,yPos);
@@ -609,6 +611,7 @@ provides: [MilkChart.Column, MilkChart.Bar, MilkChart.Line, MilkChart.Scatter, M
                     if (!typeOf(val)) {
                         val = node.get('html').toFloat();
                     }
+                    this.displayUnit = (node.get('html').indexOf('%') !== -1) ? '%' : '';
                     dataRow.push(val);
                     if (val > this.maxY) this.maxY = val;
                     if (val < this.minY) this.minY = val;
@@ -887,7 +890,8 @@ provides: [MilkChart.Column, MilkChart.Bar, MilkChart.Line, MilkChart.Scatter, M
                     if (typeOf(val) === 'null') {
                         val = node.get('html').toFloat();
                     }
-                    this.data.rows[index].push(val)
+                    this.data.rows[index].push(val);
+                    this.displayUnit = (node.get('html').indexOf('%') !== -1) ? '%' : '';
                     if (val > this.maxY) this.maxY = val;
                     if (val < this.minY) this.minY = val;
                 }.bind(this));
@@ -1031,19 +1035,19 @@ provides: [MilkChart.Column, MilkChart.Bar, MilkChart.Line, MilkChart.Scatter, M
 
     MilkChart.Area = new Class({
         /**********************************
-        * Line
+        * Area
         *
-        * The Column graph type has the following options:
-        * - showTicks: Display tick marks at every point on the line
-        * - showLines: Display the lines
-        * - lineWeight: The thickness of the lines
+        * The Area graph is similar to the line graph except it fills the area
+        * under the line.  If the stck option is true, then the graph will
+        * stack values and nothing will be obscurred.
         *********************************/
         Extends: MilkChart.Line,
         options: {
             skipLabel: 0,
             labelTicks: true,
             rowTicks: true,
-            rotateLabels: 0
+            rotateLabels: 0,
+            stack: false
         },
         __xAxisLabels: function(idx, rotateRowNames, origin) {
             /**********************************
@@ -1134,6 +1138,63 @@ provides: [MilkChart.Column, MilkChart.Bar, MilkChart.Line, MilkChart.Scatter, M
             if (this.options.showKey) this.drawKey();
             this.ctx.restore();
         },
+        getData: function() {
+            if (this.options.stack) {
+                // Line and Scatter graphs use colums instead of rows to define objects
+                this.data.rows = [];
+                // Set the column headers
+                this.element.getElement('thead').getChildren()[0].getChildren().each(function(item) {
+                   this.data.colNames.push(item.get('html'));
+                   this.data.rows.push([]);
+                }.bind(this));
+                var longestRowName = "";
+                // If the table has a footer, use this for row names
+                if (this.element.getElement('tfoot')) {
+                    this.element.getElement('tfoot').getChildren()[0].getChildren().each(function(item) {
+                        var name = item.get('html');
+                        this.data.rowNames.push(name);
+                        if (this.ctx.measureText(name).width > longestRowName.length) {
+                            longestRowName = String(name);
+                        }
+                    }.bind(this));
+                }
+                
+                // Get data from rows
+                var maxValues = [];
+                this.element.getElement('tbody').getChildren().each(function(row, idx) {
+                    maxValues[idx] = 0;
+                    row.getChildren().each(function(node, index) {
+                        var val = Number(node.get('html'));
+                        if (typeOf(val) === 'null') {
+                            val = node.get('html').toFloat();
+                        }
+                        this.displayUnit = (node.get('html').indexOf('%') !== -1) ? '%' : '';
+                        this.data.rows[index].push(val);
+                        maxValues[idx] += val;
+                    }.bind(this));
+                }.bind(this));
+                maxValues.sort(function(a,b){return b-a});
+                if (maxValues[0] > this.maxY) this.maxY = maxValues[0];
+                if (maxValues.getLast() < this.minY) this.minY = maxValues.getLast();
+                this.maxY = Math.ceil(this.maxY);
+                this.minY = Math.floor(this.minY);
+                
+                // Get the first element as row name
+                if (!this.element.getElement('tfoot')) {
+                    for (var i=1;i<=this.element.getElement('tbody').getChildren().length;i++) {
+                        var name = this.options.rowPrefix + i;
+                        this.data.rowNames.push(name);
+                        if (this.ctx.measureText(name).width > longestRowName.length) {
+                            longestRowName = String(name);
+                        }
+                    }
+                }
+                this.longestRowName = longestRowName;
+            }
+            else {
+                this.parent();
+            }
+        },
         draw: function() {
             /*************************************
              * Draws the graph
@@ -1149,21 +1210,47 @@ provides: [MilkChart.Column, MilkChart.Bar, MilkChart.Line, MilkChart.Scatter, M
             var y = (this.minY >= 0) ? this.bounds[1].y + (this.minY * this.ratio) : this.bounds[1].y - Math.floor((this.chartHeight/(this.chartLines-1)));
             
             var shapeIndex = 0;
+            var stacks = [];
+            var lastmin = [];
             this.data.rows.each(function(row, index) {
                 var rowOrigin;
+                var bump = true;
                 rowOrigin = new Point(origin.x - rowCenter, origin.y);
                 
                 this.ctx.beginPath();
                 this.ctx.fillStyle = this.colors[index];
-                //this.ctx.moveTo(rowOrigin.x + rowCenter, y - (row[0] * this.ratio));
                 this.ctx.moveTo(rowOrigin.x + rowCenter, origin.y + 0.5);
-                row.each(function(value) {
+                row.each(function(value, idx) {
+                    if (typeof(stacks[idx]) === 'undefined') {
+                        stacks[idx] = origin.y;
+                    }
                     var pointCenter = rowOrigin.x + rowCenter;
-                    var point = new Point(pointCenter, origin.y - (value * this.ratio) + 0.5);
-                    this.ctx.lineTo(point.x, point.y);
+                    var point = new Point(pointCenter, stacks[idx] - (value * this.ratio) + 0.5);
+
+                    if (this.options.stack) {
+                        this.ctx.lineTo(point.x, stacks[idx]);
+                        stacks[idx] = point.y;
+                    }
+                    else {
+                        this.ctx.lineTo(point.x, point.y);
+                    }
+
                     rowOrigin.x += this.rowWidth;
                 }.bind(this));
-                this.ctx.lineTo(rowOrigin.x - (this.rowWidth / 2), origin.y);
+                if (this.options.stack) {
+                    stacks.reverse();
+                    stacks.each(function(value, idx) {
+                        rowOrigin.x -= this.rowWidth;
+                        var pointCenter = rowOrigin.x + rowCenter;
+                        var point = new Point(pointCenter, value);
+                        
+                        this.ctx.lineTo(point.x, point.y - 0.5);
+                    }.bind(this));
+                    stacks.reverse();
+                }
+                else {
+                    this.ctx.lineTo(rowOrigin.x - (this.rowWidth / 2), origin.y);
+                }
                 this.ctx.closePath();
                 this.ctx.fill();
                 
@@ -1171,7 +1258,44 @@ provides: [MilkChart.Column, MilkChart.Bar, MilkChart.Line, MilkChart.Scatter, M
                 rowNameID++;
             }.bind(this));
         },
-        
+        _drawStacked: function() {
+            /*************************************
+             * Draws the graph
+             ************************************/
+            var y = (this.minY >= 0) ? this.bounds[1].y : this.bounds[1].y - Math.floor((this.chartHeight/(this.chartLines-1)));
+            var origin = new Point(this.bounds[0].x, y);
+            var rowPadding = Math.floor(this.rowWidth * 0.16);
+            var colWidth = Math.ceil((this.rowWidth - (rowPadding*2)) / this.data.rows[0].length);
+
+            // Should we rotate row names?
+            var rotateRowNames = (this.ctx.measureText(this.longestRowName).width > this.rowWidth) ? -1.57079633 : 0;
+            var divisor = Math.floor((this.data.rowNames.length * this.options.fontSize) / (this.chartWidth / 2));
+            if (this.options.rotateLabels) rotateRowNames = this.options.rotateLabels * Math.PI * -1 / 180; // label rotation forced
+            
+            var stacks = [];
+            this.data.rows.each(function(row, idx) {
+                stacks[idx] = 0;
+                this.__xAxisLabels(idx,rotateRowNames,origin);
+                // originY = bottom of rectangle
+                var originY = this.bounds[1].y - this.minY * this.ratio;  // x axis starts at 0
+                if (this.minY < 0) originY = this.bounds[1].y + this.minY * this.ratio;  // x axis starts below 0
+                if (this.minY > 0) originY = this.bounds[1].y + this.minY * this.ratio;  // x axis starts above 0
+                if (this.minY > 0) originY = this.bounds[1].y;  // x axis starts above 0
+                var rowOrigin = new Point(origin.x, originY);
+                
+                row.each(function(value, colorIndex) {
+                    value += stacks[idx];
+                    
+                    this.ctx.beginPath();
+                    this.ctx.fillStyle = this.colors[colorIndex];
+
+                    stacks[idx] = value;
+                    
+                    rowOrigin.x += colWidth;
+                }.bind(this));
+                origin.x += this.rowWidth;
+            }.bind(this));
+        },
         __drawRowLabels: function() {
             var origin = new Point(this.bounds[0].x, this.bounds[1].y);
             
