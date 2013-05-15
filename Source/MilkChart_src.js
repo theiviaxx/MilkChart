@@ -1229,7 +1229,7 @@ provides: [MilkChart.Column, MilkChart.Bar, MilkChart.Line, MilkChart.Scatter, M
 
                     if (this.options.stack) {
                         this.ctx.lineTo(point.x, stacks[idx]);
-                        stacks[idx] = point.y;
+                        stacks[idx] = Math.min(point.y, origin.y);
                     }
                     else {
                         this.ctx.lineTo(point.x, point.y);
